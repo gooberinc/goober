@@ -73,7 +73,7 @@ class WebScraper(commands.Cog):
 
         soup = BeautifulSoup(html, "html.parser")
 
-        for paragraph in soup.find_all('p'):
+        for paragraph in soup.find_all('a'):
             sentences = self.extract_sentences(paragraph.get_text())
             self.save_to_json(sentences)
 
