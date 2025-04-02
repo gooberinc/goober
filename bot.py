@@ -24,23 +24,20 @@ from config import *
 import traceback
 import shutil
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
-if platform.system() == 'Darwin':
+if platform.system() == "Darwin":
     try:
-        import metal
-        device = metal.MTLCreateSystemDefaultDevice()
-        if device:
-            print(f"{GREEN}Metal is supported on this mac, Attemping to use tensorflow-metal.{RESET}")
-            import tensorflow-metal as tfmetal
-            tf.config.set_visible_devices([], 'GPU')
-            physical_devices = tf.config.list_physical_devices('GPU')
-            if physical_devices:
-                tf.config.experimental.set_memory_growth(physical_devices[0], True)
+        print(f"Testing Metal support, attempting to use tensorflow-metal.")
+        import tensorflow as tf
+
+        physical_devices = tf.config.list_physical_devices("GPU")
+        if physical_devices:
+            tf.config.experimental.set_memory_growth(physical_devices[0], True)
         else:
-            print(f"{YELLOW}Metal not supported on this mac. Using regular TensorFlow.{RESET}")
+            print(f"{YELLOW}Metal not supported on this Mac. Using regular TensorFlow. (Or tensorflow-metal isnt installed){RESET}")
     except ImportError:
-        print(f"{YELLOW}tensorflow-metal not available. using regular TensorFlow.{RESET}")
+        print(f"{YELLOW}Metal module not available. Using regular TensorFlow.{RESET}")
 else:
-    print(f"{DEBUG}Not running on macOS. using regular TensorFlow.{RESET}")
+    print(f"{DEBUG}Not running on macOS. Using regular TensorFlow.{RESET}")
 
 import tensorflow as tf
 import numpy as np
