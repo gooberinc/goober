@@ -197,19 +197,19 @@ def check_for_update():
         print(f"{RED}{get_translation(LOCALE, 'invalid_server')}{RESET}")
         return None, None 
 
-    if local_version == "0.0.0":
-        with open(LOCAL_VERSION_FILE, "w") as f:
-            f.write(latest_version)
+    if local_version == "0.0.0" or None:
+        print(f"{RED}I cant find the local_version variable! Or its been tampered with and its not an interger!{RESET}")
+        return
+
     generate_sha256_of_current_file()
     gooberhash = latest_version_info.get("hash")
-    if gooberhash == currenthash:
-        if local_version < latest_version:
-            print(f"{YELLOW}{get_translation(LOCALE, 'new_version').format(latest_version=latest_version, local_version=local_version)}{RESET}")
-            print(f"{YELLOW}{get_translation(LOCALE, 'changelog').format(VERSION_URL=VERSION_URL)}{RESET}")
-        else:
-            print(f"{GREEN}{get_translation(LOCALE, 'latest_version')} {local_version}{RESET}")
-            print(f"{get_translation(LOCALE, 'latest_version2').format(VERSION_URL=VERSION_URL)}\n\n")
-    else:
+    if local_version < latest_version:
+        print(f"{YELLOW}{get_translation(LOCALE, 'new_version').format(latest_version=latest_version, local_version=local_version)}{RESET}")
+        print(f"{YELLOW}{get_translation(LOCALE, 'changelog').format(VERSION_URL=VERSION_URL)}{RESET}")
+    if local_version == latest_version:
+        print(f"{GREEN}{get_translation(LOCALE, 'latest_version')} {local_version}{RESET}")
+        print(f"{get_translation(LOCALE, 'latest_version2').format(VERSION_URL=VERSION_URL)}\n\n")   
+    if gooberhash != currenthash:
         print(f"{YELLOW}{get_translation(LOCALE, 'modification_warning')}")
         print(f"{YELLOW}{get_translation(LOCALE, 'reported_version')} {local_version}{RESET}")
         print(f"{DEBUG}{get_translation(LOCALE, 'current_hash')} {currenthash}{RESET}")
