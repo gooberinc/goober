@@ -401,18 +401,23 @@ async def send_message(ctx, message=None, embed=None, file=None, edit=False, mes
     app_commands.Choice(name="Select servers to retrain", value="select")
 ])
 async def retrain_models(ctx, option: app_commands.Choice[str]):
-    if ctx.author.id != ownerid:
-        return await ctx.send("You don't have permission to use this command.", ephemeral=True)
-
-    if option.value == "current":
-        server_id = ctx.guild.id if ctx.guild else "DM"
-        await retrain_single_server(ctx, server_id)
-    
-    elif option.value == "all":
-        await retrain_all_servers(ctx)
-    
-    elif option.value == "select":
-        await show_server_selection(ctx)
+    if ctx.author.id == ownerid:
+        if option.value == "current":
+            server_id = ctx.guild.id if ctx.guild else "DM"
+            await retrain_single_server(ctx, server_id)
+        elif option.value == "all":
+            await retrain_all_servers(ctx)
+        elif option.value == "select":
+            await show_server_selection(ctx)
+    else:
+        if ctx.guild and (ctx.author.guild_permissions.administrator or any(role.permissions.administrator for role in ctx.author.roles)):
+            if option.value == "current":
+                server_id = ctx.guild.id
+                await retrain_single_server(ctx, server_id)
+            else:
+                await ctx.send("You can only retrain the current server.", ephemeral=True)
+        else:
+            await ctx.send("You don't have permission to use this command.", ephemeral=True)
 
 async def retrain_single_server(ctx, server_id):
     memory_file = f"memories/memory_{server_id}.json"
