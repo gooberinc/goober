@@ -400,18 +400,24 @@ async def send_message(ctx, message=None, embed=None, file=None, edit=False, mes
     app_commands.Choice(name="Retrain all servers", value="all"),
     app_commands.Choice(name="Select servers to retrain", value="select")
 ])
-async def retrain_models(ctx, option: app_commands.Choice[str]):
+async def retrain_models(ctx, option: str = None):
+    if option is None and not ctx.interaction:
+        options_text = "all, current, select"
+        return await ctx.send(f"Please specify an option:\n{options_text}")
+    
+    if isinstance(option, app_commands.Choice):
+        option = option.value
     if ctx.author.id == ownerid:
-        if option.value == "current":
+        if option == "current":
             server_id = ctx.guild.id if ctx.guild else "DM"
             await retrain_single_server(ctx, server_id)
-        elif option.value == "all":
+        elif option == "all":
             await retrain_all_servers(ctx)
-        elif option.value == "select":
+        elif option == "select":
             await show_server_selection(ctx)
     else:
         if ctx.guild and (ctx.author.guild_permissions.administrator or any(role.permissions.administrator for role in ctx.author.roles)):
-            if option.value == "current":
+            if option == "current":
                 server_id = ctx.guild.id
                 await retrain_single_server(ctx, server_id)
             else:
@@ -497,7 +503,10 @@ async def show_server_selection(ctx):
         menu.callback = lambda interaction, m=menu: handle_server_selection(interaction, m)
         view.add_item(menu)
     
-    await ctx.send("Select which servers to retrain:", view=view)
+    if ctx.interaction:
+        await ctx.send("Select which servers to retrain:", view=view)
+    else:
+        await ctx.reply("Select which servers to retrain:", view=view)
 
 async def handle_server_selection(interaction, select_menu):
     await interaction.response.defer()
