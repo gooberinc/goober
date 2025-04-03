@@ -209,10 +209,10 @@ def check_for_update():
     if local_version == latest_version:
         print(f"{GREEN}{get_translation(LOCALE, 'latest_version')} {local_version}{RESET}")
         print(f"{get_translation(LOCALE, 'latest_version2').format(VERSION_URL=VERSION_URL)}\n\n")   
-    if gooberhash != currenthash:
-        print(f"{YELLOW}{get_translation(LOCALE, 'modification_warning')}")
-        print(f"{YELLOW}{get_translation(LOCALE, 'reported_version')} {local_version}{RESET}")
-        print(f"{DEBUG}{get_translation(LOCALE, 'current_hash')} {currenthash}{RESET}")
+        if gooberhash != currenthash:
+            print(f"{YELLOW}{get_translation(LOCALE, 'modification_warning')}")
+            print(f"{YELLOW}{get_translation(LOCALE, 'reported_version')} {local_version}{RESET}")
+            print(f"{DEBUG}{get_translation(LOCALE, 'current_hash')} {currenthash}{RESET}")
 
 
 check_for_update()
