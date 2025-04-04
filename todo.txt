@@ -1,0 +1,2 @@
+- fix missing translations in some cases
+- revamp wiki
