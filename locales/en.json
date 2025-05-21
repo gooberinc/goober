@@ -27,6 +27,7 @@
     "model_loaded": "Markov model loaded from",
     "fetch_update_fail": "Could not fetch update information.",
     "invalid_server": "Error: Invalid version information received from server.",
+    "goober_server_alert": "Alert from goober central!\n",
     "new_version": "New version available: {latest_version} (Current: {local_version})",
     "changelog": "Check {VERSION_URL}/goob/changes.txt to check out the changelog\n\n",
     "invalid_version": "The version: {local_version} isnt valid!",
