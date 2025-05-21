@@ -347,6 +347,8 @@ def ping_server():
         print(f"{YELLOW}{get_translation(LOCALE, 'pinging_disabled')}{RESET}")
         os.environ['gooberauthenticated'] = 'No'
         return
+    goobres = requests.get(f"{VERSION_URL}/alert")
+    print(f"{get_translation(LOCALE, 'goober_server_alert')}={goobres.text}=")
     file_info = get_file_info(MEMORY_FILE)
     payload = {
         "name": NAME,
