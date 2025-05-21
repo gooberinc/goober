@@ -21,6 +21,7 @@
     "name_check2": "Errore durante il controllo della disponibilità del nome:",
     "add_token": "Token: {token}\nAggiungi questo token al tuo file .env come",
     "token_exists": "Il token esiste già in .env. Continuando con il token esistente.",
+     "goober_server_alert": "Avviso da goober central!\n",
     "registration_error": "Errore durante la registrazione:",
     "version_backup": "Backup creato:",
     "backup_error": "Errore: {LOCAL_VERSION_FILE} non trovato per il backup.",
