@@ -244,6 +244,7 @@ def check_for_update():
             print(f"{YELLOW}{get_translation(LOCALE, 'modification_warning')}{RESET}")
             print(f"{YELLOW}{get_translation(LOCALE, 'reported_version')} {local_version}{RESET}")
             print(f"{DEBUG}{get_translation(LOCALE, 'current_hash')} {currenthash}{RESET}")
+    print(f"{DEBUG}{get_translation(LOCALE, 'current_hash')} {currenthash}{RESET}")
 
 check_for_update()
 
