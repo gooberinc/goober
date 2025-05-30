@@ -203,7 +203,7 @@ def generate_sha256_of_current_file():
 
 
 latest_version = "0.0.0"
-local_version = "0.14.8.3.4.1"
+local_version = "0.14.9"
 os.environ['gooberlocal_version'] = local_version
 
 
@@ -234,11 +234,14 @@ def check_for_update():
     if local_version < latest_version:
         print(f"{YELLOW}{get_translation(LOCALE, 'new_version').format(latest_version=latest_version, local_version=local_version)}{RESET}")
         print(f"{YELLOW}{get_translation(LOCALE, 'changelog').format(VERSION_URL=VERSION_URL)}{RESET}")
-    if local_version == latest_version:
+
+    elif local_version == latest_version:
         print(f"{GREEN}{get_translation(LOCALE, 'latest_version')} {local_version}{RESET}")
-        print(f"{get_translation(LOCALE, 'latest_version2').format(VERSION_URL=VERSION_URL)}\n\n")   
+        print(f"{get_translation(LOCALE, 'latest_version2').format(VERSION_URL=VERSION_URL)}\n\n")
+
+        # finally fucking fixed this i tell you
         if gooberhash != currenthash:
-            print(f"{YELLOW}{get_translation(LOCALE, 'modification_warning')}")
+            print(f"{YELLOW}{get_translation(LOCALE, 'modification_warning')}{RESET}")
             print(f"{YELLOW}{get_translation(LOCALE, 'reported_version')} {local_version}{RESET}")
             print(f"{DEBUG}{get_translation(LOCALE, 'current_hash')} {currenthash}{RESET}")
 
@@ -348,7 +351,7 @@ def ping_server():
         os.environ['gooberauthenticated'] = 'No'
         return
     goobres = requests.get(f"{VERSION_URL}/alert")
-    print(f"{get_translation(LOCALE, 'goober_server_alert')}={goobres.text}=")
+    print(f"{get_translation(LOCALE, 'goober_server_alert')}{goobres.text}")
     file_info = get_file_info(MEMORY_FILE)
     payload = {
         "name": NAME,
