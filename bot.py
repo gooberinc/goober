@@ -112,7 +112,7 @@ used_words = set()
 
 @bot.event
 async def on_ready():
-    
+    global launched
     folder_name = "cogs"
     if launched == True:
         pass
