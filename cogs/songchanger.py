@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from config import RED, GREEN, RESET, LOCAL_VERSION_FILE
+from modules.globalvars import RED, GREEN, RESET, LOCAL_VERSION_FILE
 import os
 
 class songchange(commands.Cog):

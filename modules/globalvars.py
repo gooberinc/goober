@@ -1,9 +1,16 @@
-import os 
-from dotenv import load_dotenv
+import os
 import platform
-import random
+from dotenv import load_dotenv
+import pathlib
+env_path = pathlib.Path(__file__).parent.parent / '.env'
+load_dotenv(dotenv_path=env_path)
 
-load_dotenv()
+
+RED = "\033[31m"
+GREEN = "\033[32m"
+YELLOW = "\033[33m"
+DEBUG = "\033[1;30m"
+RESET = "\033[0m"
 VERSION_URL = "https://goober.expect.ovh"
 UPDATE_URL = VERSION_URL+"/latest_version.json"
 LOCAL_VERSION_FILE = "current_version.txt" 
@@ -30,8 +37,7 @@ ALIVEPING = os.getenv("ALIVEPING")
 IGNOREWARNING = False
 song = os.getenv("song")
 arch = platform.machine()
-RED = "\033[31m"
-GREEN = "\033[32m"
-YELLOW = "\033[33m"
-DEBUG = "\033[1;30m"
-RESET = "\033[0m"
+slash_commands_enabled = False
+latest_version = "0.0.0"
+local_version = "0.15.0"
+os.environ['gooberlocal_version'] = local_version

@@ -10,7 +10,7 @@ import time
 import aiohttp
 import re
 from aiohttp import WSMsgType
-from config import VERSION_URL
+from modules.globalvars import VERSION_URL
 import sys
 import subprocess
 

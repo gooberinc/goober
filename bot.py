@@ -2,28 +2,29 @@ import discord
 from discord.ext import commands, tasks
 from discord import app_commands
 import json
-import markovify
 import random
 import os
 import time
 import re
 import os
 import requests
-import platform
 import subprocess
 import psutil
-import pickle
-import hashlib
 from better_profanity import profanity
-from config import *
 import traceback
 import shutil
 import nltk
 from nltk.data import find
 from nltk import download
-
+from modules.globalvars import *
+from modules.central import ping_server
+from modules.translations import *
+from modules.markovmemory import *
+from modules.version import *
 
 print(splashtext) # you can use https://patorjk.com/software/taag/ for 3d text or just remove this entirely
+check_for_update()
+
 
 def check_resources():
     resources = {
@@ -67,108 +68,7 @@ def download_json():
                 file.write(response.text)
 
 download_json()
-def load_translations():
-    translations = {}
-    translations_dir = os.path.join(os.path.dirname(__file__), "locales")
-    
-    for filename in os.listdir(translations_dir):
-        if filename.endswith(".json"):
-            lang_code = filename.replace(".json", "")
-            with open(os.path.join(translations_dir, filename), "r", encoding="utf-8") as f:
-                translations[lang_code] = json.load(f)
-    
-    return translations
 
-translations = load_translations()
-
-def get_translation(lang: str, key: str):
-    lang_translations = translations.get(lang, translations["en"])
-    if key not in lang_translations:
-        print(f"{RED}Missing key: {key} in language {lang}{RESET}")
-    return lang_translations.get(key, key)
-
-
-
-def is_name_available(NAME):
-    if os.getenv("gooberTOKEN"):
-        return
-    try:
-        response = requests.post(f"{VERSION_URL}/check-if-available", json={"name": NAME}, headers={"Content-Type": "application/json"})
-        
-        if response.status_code == 200:
-            data = response.json()
-            return data.get("available", False)
-        else:
-            print(f"{get_translation(LOCALE, 'name_check')}", response.json())
-            return False
-    except Exception as e:
-        print(f"{get_translation(LOCALE, 'name_check2')}", e)
-        return False
-
-def register_name(NAME):
-    try:
-        if ALIVEPING == False:
-            return
-        # check if the name is avaliable
-        if not is_name_available(NAME):
-            if os.getenv("gooberTOKEN"):
-                return
-            print(f"{RED}{get_translation(LOCALE, 'name_taken')}{RESET}")
-            quit()
-        
-        # if it is register it
-        response = requests.post(f"{VERSION_URL}/register", json={"name": NAME}, headers={"Content-Type": "application/json"})
-        
-        if response.status_code == 200:
-            data = response.json()
-            token = data.get("token")
-            
-            if not os.getenv("gooberTOKEN"):
-                print(f"{GREEN}{get_translation(LOCALE, 'add_token').format(token=token)} gooberTOKEN=<token>.{RESET}")
-                quit()
-            else:
-                print(f"{GREEN}{RESET}")
-            
-            return token
-        else:
-            print(f"{RED}{get_translation(LOCALE, 'token_exists').format()}{RESET}", response.json())
-            return None
-    except Exception as e:
-        print(f"{RED}{get_translation(LOCALE, 'registration_error').format()}{RESET}", e)
-        return None
-
-register_name(NAME)
-
-def save_markov_model(model, filename='markov_model.pkl'):
-    with open(filename, 'wb') as f:
-        pickle.dump(model, f)
-    print(f"Markov model saved to {filename}.")
-
-def load_markov_model(filename='markov_model.pkl'):
-
-    try:
-        with open(filename, 'rb') as f:
-            model = pickle.load(f)
-        print(f"{GREEN}{get_translation(LOCALE, 'model_loaded')} {filename}.{RESET}")
-        return model
-    except FileNotFoundError:
-        print(f"{RED}{filename} {get_translation(LOCALE, 'not_found')}{RESET}")
-        return None
-
-def get_latest_version_info():
-
-    try:
-
-        response = requests.get(UPDATE_URL, timeout=5)
-        if response.status_code == 200:
-            return response.json()
-        else:
-            print(f"{RED}{get_translation(LOCALE, 'version_error')} {response.status_code}{RESET}")
-            return None
-    except requests.RequestException as e:
-        print(f"{RED}{get_translation(LOCALE, 'version_error')} {e}{RESET}")
-        return None
-    
 async def load_cogs_from_folder(bot, folder_name="cogs"):
     for filename in os.listdir(folder_name):
         if filename.endswith(".py") and not filename.startswith("_"):
@@ -180,116 +80,9 @@ async def load_cogs_from_folder(bot, folder_name="cogs"):
                 print(f"{RED}{get_translation(LOCALE, 'cog_fail')} {cog_name} {e}{RESET}")
                 traceback.print_exc()
 
-async def load_modules(bot, folder_name="modules"):
-    for filename in os.listdir(folder_name):
-        if filename.endswith(".py") and not filename.startswith("_"):
-            cog_name = filename[:-3]
-            try:
-                await bot.load_extension(f"{folder_name}.{cog_name}")
-                print(f"{GREEN}{get_translation(LOCALE, 'loaded_cog2')} {cog_name}{RESET}")
-            except Exception as e:
-                print(f"{RED}{get_translation(LOCALE, 'cog_fail2')} {cog_name} {e}{RESET}")
-                traceback.print_exc()
 
 currenthash = ""
-def generate_sha256_of_current_file():
-    global currenthash
-    sha256_hash = hashlib.sha256()
-    with open(__file__, "rb") as f:
-        for byte_block in iter(lambda: f.read(4096), b""):
-            sha256_hash.update(byte_block)
-    currenthash = sha256_hash.hexdigest()
 
-
-
-latest_version = "0.0.0"
-local_version = "0.14.9"
-os.environ['gooberlocal_version'] = local_version
-
-
-def check_for_update():
-    if ALIVEPING == "false":
-        return
-    global latest_version, local_version 
-    
-    latest_version_info = get_latest_version_info()
-    if not latest_version_info:
-        print(f"{get_translation(LOCALE, 'fetch_update_fail')}")
-        return None, None 
-
-    latest_version = latest_version_info.get("version")
-    os.environ['gooberlatest_version'] = latest_version
-    download_url = latest_version_info.get("download_url")
-
-    if not latest_version or not download_url:
-        print(f"{RED}{get_translation(LOCALE, 'invalid_server')}{RESET}")
-        return None, None 
-
-    if local_version == "0.0.0" or None:
-        print(f"{RED}I cant find the local_version variable! Or its been tampered with and its not an interger!{RESET}")
-        return
-
-    generate_sha256_of_current_file()
-    gooberhash = latest_version_info.get("hash")
-    if local_version < latest_version:
-        print(f"{YELLOW}{get_translation(LOCALE, 'new_version').format(latest_version=latest_version, local_version=local_version)}{RESET}")
-        print(f"{YELLOW}{get_translation(LOCALE, 'changelog').format(VERSION_URL=VERSION_URL)}{RESET}")
-
-    elif local_version == latest_version:
-        print(f"{GREEN}{get_translation(LOCALE, 'latest_version')} {local_version}{RESET}")
-        print(f"{get_translation(LOCALE, 'latest_version2').format(VERSION_URL=VERSION_URL)}\n\n")
-
-        # finally fucking fixed this i tell you
-        if gooberhash != currenthash:
-            print(f"{YELLOW}{get_translation(LOCALE, 'modification_warning')}{RESET}")
-            print(f"{YELLOW}{get_translation(LOCALE, 'reported_version')} {local_version}{RESET}")
-            print(f"{DEBUG}{get_translation(LOCALE, 'current_hash')} {currenthash}{RESET}")
-    print(f"{DEBUG}{get_translation(LOCALE, 'current_hash')} {currenthash}{RESET}")
-
-check_for_update()
-
-def get_file_info(file_path):
-    try:
-        file_size = os.path.getsize(file_path)
-        with open(file_path, "r") as f:
-            lines = f.readlines()
-        return {"file_size_bytes": file_size, "line_count": len(lines)}
-    except Exception as e:
-        return {"error": str(e)}
-
-def load_memory():
-    data = []
-
-    # load data from MEMORY_FILE
-    try:
-        with open(MEMORY_FILE, "r") as f:
-            data = json.load(f)
-    except FileNotFoundError:
-        pass
-
-    if not os.path.exists(MEMORY_LOADED_FILE):
-        try:
-            with open(DEFAULT_DATASET_FILE, "r") as f:
-                default_data = json.load(f)
-                data.extend(default_data) 
-        except FileNotFoundError:
-            pass
-        with open(MEMORY_LOADED_FILE, "w") as f:
-            f.write("Data loaded") 
-    return data
-
-def save_memory(memory):
-    with open(MEMORY_FILE, "w") as f:
-        json.dump(memory, f, indent=4)
-
-def train_markov_model(memory, additional_data=None):
-    if not memory:
-        return None
-    text = "\n".join(memory)
-    if additional_data:
-        text += "\n" + "\n".join(additional_data)
-    model = markovify.NewlineText(text, state_size=2)
-    return model
 #this doesnt work and im extremely pissed and mad
 def append_mentions_to_18digit_integer(message):
     pattern = r'\b\d{18}\b'
@@ -317,7 +110,6 @@ if not markov_model:
 generated_sentences = set()
 used_words = set()
 
-slash_commands_enabled = False
 @bot.event
 async def on_ready():
     
@@ -328,7 +120,6 @@ async def on_ready():
     else:
        print(f"{DEBUG}{get_translation(LOCALE, 'folder_exists').format(folder_name=folder_name)}{RESET}")
     markov_model = train_markov_model(memory)
-    await load_modules(bot)
     await load_cogs_from_folder(bot)
     global slash_commands_enabled
     print(f"{GREEN}{get_translation(LOCALE, 'logged_in')} {bot.user}{RESET}")
@@ -345,33 +136,6 @@ async def on_ready():
     if not song:
         return  
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=f"{song}"))
-
-def ping_server():
-    if ALIVEPING == "false":
-        print(f"{YELLOW}{get_translation(LOCALE, 'pinging_disabled')}{RESET}")
-        os.environ['gooberauthenticated'] = 'No'
-        return
-    goobres = requests.get(f"{VERSION_URL}/alert")
-    print(f"{get_translation(LOCALE, 'goober_server_alert')}{goobres.text}")
-    file_info = get_file_info(MEMORY_FILE)
-    payload = {
-        "name": NAME,
-        "memory_file_info": file_info,
-        "version": local_version,
-        "slash_commands": slash_commands_enabled,
-        "token": gooberTOKEN
-    }
-    try:
-        response = requests.post(VERSION_URL+"/ping", json=payload)
-        if response.status_code == 200:
-            print(f"{GREEN}{get_translation(LOCALE, 'goober_ping_success').format(NAME=NAME)}{RESET}")
-            os.environ['gooberauthenticated'] = 'Yes'
-        else:
-            print(f"{RED}{get_translation(LOCALE, 'goober_ping_fail')} {response.status_code}{RESET}")
-            os.environ['gooberauthenticated'] = 'No'
-    except Exception as e:
-        print(f"{RED}{get_translation(LOCALE, 'goober_ping_fail2')} {str(e)}{RESET}")
-        os.environ['gooberauthenticated'] = 'No'
 
 
 positive_gifs = os.getenv("POSITIVE_GIFS").split(',')

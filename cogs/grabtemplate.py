@@ -3,20 +3,7 @@ from discord.ext import commands
 import os
 import requests
 import ast
-
-def get_version_url(config_file_path):
-    with open(config_file_path, "r") as file:
-        file_content = file.read()
-    tree = ast.parse(file_content)
-    for node in ast.walk(tree):
-        if isinstance(node, ast.Assign):
-            for target in node.targets:
-                if isinstance(target, ast.Name) and target.id == "VERSION_URL":
-                    if isinstance(node.value, ast.Str):
-                        return node.value.s 
-    return None
-config_file_path = "config.py"
-VERSION_URL = get_version_url(config_file_path)
+from modules.globalvars import VERSION_URL
 
 
 class grabTemplate(commands.Cog):

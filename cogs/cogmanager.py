@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 import os 
-from config import ownerid
+from modules.globalvars import ownerid
 
 class CogManager(commands.Cog):
     def __init__(self, bot):
