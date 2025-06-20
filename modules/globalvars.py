@@ -40,5 +40,5 @@ song = os.getenv("song")
 arch = platform.machine()
 slash_commands_enabled = False
 latest_version = "0.0.0"
-local_version = "0.15.0"
+local_version = "0.15.1"
 os.environ['gooberlocal_version'] = local_version
