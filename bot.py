@@ -24,7 +24,7 @@ from modules.version import *
 
 print(splashtext) # you can use https://patorjk.com/software/taag/ for 3d text or just remove this entirely
 check_for_update()
-launched = None
+launched = False
 
 def check_resources():
     resources = {
