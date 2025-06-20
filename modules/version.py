@@ -4,6 +4,7 @@ from modules.globalvars import *
 import traceback
 import requests
 import subprocess
+import sys
 
 def run_cmd(cmd):
     result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
@@ -21,16 +22,10 @@ def auto_update(branch='main', remote='origin'):
         print(f"Remote {remote}/{branch} is ahead. Updating...")
         pull_result = run_cmd(f'git pull {remote} {branch}')
         print(pull_result)
+        print("Please Restart goober!")
+        sys.exit(0)
     else:
-        print(f"Local {remote}/{branch} is ahead. Not Updating...")
-
-def generate_sha256_of_current_file():
-    global currenthash
-    sha256_hash = hashlib.sha256()
-    with open(__file__, "rb") as f:
-        for byte_block in iter(lambda: f.read(4096), b""):
-            sha256_hash.update(byte_block)
-    currenthash = sha256_hash.hexdigest()
+        print(f"Local {remote}/{branch} is ahead and/or up to par. Not Updating...")
 
 def get_latest_version_info():
 
@@ -68,22 +63,10 @@ def check_for_update():
         print(f"{RED}I cant find the local_version variable! Or its been tampered with and its not an interger!{RESET}")
         return
 
-    generate_sha256_of_current_file()
-    gooberhash = latest_version_info.get("hash")
     if local_version < latest_version:
         print(f"{YELLOW}{get_translation(LOCALE, 'new_version').format(latest_version=latest_version, local_version=local_version)}{RESET}")
         print(f"{YELLOW}{get_translation(LOCALE, 'changelog').format(VERSION_URL=VERSION_URL)}{RESET}")
         auto_update()
-
-
     elif local_version == latest_version:
         print(f"{GREEN}{get_translation(LOCALE, 'latest_version')} {local_version}{RESET}")
         print(f"{get_translation(LOCALE, 'latest_version2').format(VERSION_URL=VERSION_URL)}\n\n")
-
-        # finally fucking fixed this i tell you
-        if gooberhash != currenthash:
-            print(f"{YELLOW}{get_translation(LOCALE, 'modification_warning')}{RESET}")
-            print(f"{YELLOW}{get_translation(LOCALE, 'reported_version')} {local_version}{RESET}")
-            print(f"{DEBUG}{get_translation(LOCALE, 'current_hash')} {currenthash}{RESET}")
-    print(f"{DEBUG}{get_translation(LOCALE, 'current_hash')} {currenthash}{RESET}")
-
