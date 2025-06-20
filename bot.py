@@ -24,7 +24,7 @@ from modules.version import *
 
 print(splashtext) # you can use https://patorjk.com/software/taag/ for 3d text or just remove this entirely
 check_for_update()
-
+launched = None
 
 def check_resources():
     resources = {
@@ -114,6 +114,8 @@ used_words = set()
 async def on_ready():
     
     folder_name = "cogs"
+    if launched == True:
+        pass
     if not os.path.exists(folder_name):
         os.makedirs(folder_name)
         print(f"{GREEN}{get_translation(LOCALE, 'folder_created').format(folder_name=folder_name)}{RESET}")
@@ -136,6 +138,7 @@ async def on_ready():
     if not song:
         return  
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=f"{song}"))
+    launched = True
 
 
 positive_gifs = os.getenv("POSITIVE_GIFS").split(',')
