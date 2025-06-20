@@ -115,7 +115,7 @@ async def on_ready():
     global launched
     folder_name = "cogs"
     if launched == True:
-        pass
+        return
     if not os.path.exists(folder_name):
         os.makedirs(folder_name)
         print(f"{GREEN}{get_translation(LOCALE, 'folder_created').format(folder_name=folder_name)}{RESET}")
