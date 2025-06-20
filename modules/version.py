@@ -3,6 +3,26 @@ from modules.translations import *
 from modules.globalvars import *
 import traceback
 import requests
+import subprocess
+
+def run_cmd(cmd):
+    result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+    return result.stdout.strip()
+
+def is_remote_ahead(branch='main', remote='origin'):
+    run_cmd(f'git fetch {remote}')
+    count = run_cmd(f'git rev-list --count HEAD..{remote}/{branch}')
+    return int(count) > 0
+
+def auto_update(branch='main', remote='origin'):
+    if AUTOUPDATE != "True":
+        pass
+    if is_remote_ahead(branch, remote):
+        print(f"Remote {remote}/{branch} is ahead. Updating...")
+        pull_result = run_cmd(f'git pull {remote} {branch}')
+        print(pull_result)
+    else:
+        print(f"Local {remote}/{branch} is ahead. Not Updating...")
 
 def generate_sha256_of_current_file():
     global currenthash
@@ -27,8 +47,8 @@ def get_latest_version_info():
         return None
     
 def check_for_update():
-    if ALIVEPING == "false":
-        return
+    if ALIVEPING != "True":
+        pass
     global latest_version, local_version 
     
     latest_version_info = get_latest_version_info()
@@ -53,6 +73,8 @@ def check_for_update():
     if local_version < latest_version:
         print(f"{YELLOW}{get_translation(LOCALE, 'new_version').format(latest_version=latest_version, local_version=local_version)}{RESET}")
         print(f"{YELLOW}{get_translation(LOCALE, 'changelog').format(VERSION_URL=VERSION_URL)}{RESET}")
+        auto_update()
+
 
     elif local_version == latest_version:
         print(f"{GREEN}{get_translation(LOCALE, 'latest_version')} {local_version}{RESET}")

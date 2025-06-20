@@ -34,6 +34,7 @@ MEMORY_FILE = "memory.json"
 DEFAULT_DATASET_FILE = "defaultdataset.json"
 MEMORY_LOADED_FILE = "MEMORY_LOADED"
 ALIVEPING = os.getenv("ALIVEPING")
+AUTOUPDATE = os.getenv("AUTOUPDATE")
 IGNOREWARNING = False
 song = os.getenv("song")
 arch = platform.machine()
