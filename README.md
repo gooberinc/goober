@@ -1,8 +1,4 @@
-Discord bot that learns from what people say!
-
-Please see the [wiki](https://wiki.goober.whatdidyouexpect.eu)
-
-Keep in mind that most of the bot was written at 2am
+knockoff of genai basically :p
 
 
 Special thanks to [Charlie's Computers](https://github.com/PowerPCFan) for being the only one I know of that's hosting Goober 24/7
