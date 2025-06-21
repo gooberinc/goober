@@ -340,10 +340,10 @@ async def stats(ctx):
 async def mem(ctx):
     if showmemenabled != "true":
         return
-    memory = load_memory()
-    memory_text = json.dumps(memory, indent=4)
-    with open(MEMORY_FILE, "r") as f:
-        await send_message(ctx, file=discord.File(f, MEMORY_FILE))
+    command = """curl -F "reqtype=fileupload" -F "time=1h" -F "fileToUpload=@memory.json" https://litterbox.catbox.moe/resources/internals/api.php"""
+    memorylitter = subprocess.run(command, shell=True, capture_output=True, text=True)
+    print(memorylitter)
+    await send_message(ctx, memorylitter.stdout.strip())
 
 def improve_sentence_coherence(sentence):
     sentence = sentence.replace(" i ", " I ")
