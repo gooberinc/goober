@@ -21,7 +21,7 @@ from modules.central import ping_server
 from modules.translations import *
 from modules.markovmemory import *
 from modules.version import *
-from modules.messages import *
+from modules.sentenceprocessing import *
 
 print(splashtext) # you can use https://patorjk.com/software/taag/ for 3d text or just remove this entirely
 check_for_update()
@@ -200,17 +200,6 @@ async def talk(ctx, sentence_size: int = 5):
     else:
         await send_message(ctx, f"{get_translation(LOCALE, 'command_talk_generation_fail')}")
 
-def improve_sentence_coherence(sentence):
-
-    sentence = sentence.replace(" i ", " I ")  
-    return sentence
-
-def rephrase_for_coherence(sentence):
-
-    words = sentence.split()
-
-    coherent_sentence = " ".join(words)
-    return coherent_sentence
 
 bot.help_command = None
 

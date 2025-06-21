@@ -54,3 +54,15 @@ def preprocess_message(message):
     tokens = word_tokenize(message)
     tokens = [token for token in tokens if token.isalnum()]
     return " ".join(tokens)
+
+def improve_sentence_coherence(sentence):
+
+    sentence = sentence.replace(" i ", " I ")  
+    return sentence
+
+def rephrase_for_coherence(sentence):
+
+    words = sentence.split()
+
+    coherent_sentence = " ".join(words)
+    return coherent_sentence
