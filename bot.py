@@ -124,6 +124,7 @@ async def on_ready():
         print(f"{GREEN}{get_translation(LOCALE, 'folder_created').format(folder_name=folder_name)}{RESET}")
     else:
         print(f"{DEBUG}{get_translation(LOCALE, 'folder_exists').format(folder_name=folder_name)}{RESET}")
+    await load_cogs_from_folder(bot)
     try:
         synced = await bot.tree.sync()
         print(f"{GREEN}{get_translation(LOCALE, 'synced_commands')} {len(synced)} {get_translation(LOCALE, 'synced_commands2')} {RESET}")
@@ -166,6 +167,8 @@ async def on_command_error(ctx, error):
             type(error), error, error.__traceback__, 
             context=f"Command: {ctx.command} | User: {ctx.author}"
         )
+
+
 
 
 
