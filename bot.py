@@ -16,7 +16,6 @@ from discord import app_commands
 import nltk
 from nltk.data import find
 from nltk import download
-
 from better_profanity import profanity
 
 from modules.globalvars import *

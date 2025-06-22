@@ -131,11 +131,34 @@ def check_memory():
     except ImportError:
         print("psutil is not installed. Memory check skipped.")
 
+def check_cpu():
+        print("Measuring CPU usage per core...")
+        cpu_per_core = psutil.cpu_percent(interval=1, percpu=True)
+        for idx, core_usage in enumerate(cpu_per_core):
+            bar_length = int(core_usage / 5) 
+            bar = '█' * bar_length + '-' * (20 - bar_length)
+            if core_usage > 85:
+                color = RED
+            elif core_usage > 60:
+                color = YELLOW
+            else:
+                color = GREEN
+            print(f"Core {idx}: {color}[{bar}] {core_usage:.2f}%{RESET}")
+
+        total_cpu = sum(cpu_per_core) / len(cpu_per_core)
+        print(f"Total CPU Usage: {total_cpu:.2f}%")
+
+        if total_cpu > 85:
+            print(f"{YELLOW}High average CPU usage: {total_cpu:.2f}%{RESET}")
+        if total_cpu > 95:
+            print(f"{RED}Really high CPU load! System may throttle or hang.{RESET}")
+            sys.exit(1)
+
 def check_memoryjson():
     try:
         print(f"Memory file: {os.path.getsize(MEMORY_FILE) / (1024 ** 2):.2f} MB")
-        if os.path.getsize(MEMORY_FILE) == 1_073_741_824:
-            print(f"{YELLOW}Memory file is 1GB, consider clearing it to free up space.{RESET}")
+        if os.path.getsize(MEMORY_FILE) > 1_073_741_824:
+            print(f"{YELLOW}Memory file is 1GB or higher, consider clearing it to free up space.{RESET}")
     except FileNotFoundError:
         print(f"{YELLOW}Memory file not found.{RESET}")
 
@@ -177,6 +200,7 @@ def start_checks():
         check_latency()
         check_memory()
         check_memoryjson()
+        check_cpu()
         print("Continuing in 5 seconds... Press any key to skip.")
         presskey2skip(5)
         os.system('cls' if os.name == 'nt' else 'clear')
