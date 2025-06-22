@@ -6,12 +6,12 @@ import subprocess
 import pkg_resources
 import ast
 import requests
+import importlib.metadata
 
 from modules.globalvars import *
 from ping3 import ping
 
 def check_requirements():
-    #making this made me cry
     STD_LIB_MODULES = {
         "os", "sys", "time", "ast", "asyncio", "re", "subprocess", "json",
         "datetime", "threading", "math", "logging", "functools", "itertools",
@@ -21,64 +21,69 @@ def check_requirements():
     }
     PACKAGE_ALIASES = {
         "discord": "discord.py",
+        "better_profanity": "better-profanity",
+        
     }
+
     parent_dir = os.path.dirname(os.path.abspath(__file__))
     requirements_path = os.path.join(parent_dir, '..', 'requirements.txt')
     requirements_path = os.path.abspath(requirements_path)
+
     if not os.path.exists(requirements_path):
         print(f"{RED}requirements.txt not found at {requirements_path} was it tampered with?{RESET}")
         return
+
     with open(requirements_path, 'r') as f:
         lines = f.readlines()
         requirements = {
             line.strip() for line in lines
             if line.strip() and not line.startswith('#')
         }
-        cogs_dir = os.path.abspath(os.path.join(parent_dir, '..', 'cogs'))
-        if os.path.isdir(cogs_dir):
-            for filename in os.listdir(cogs_dir):
-                if filename.endswith('.py'):
-                    filepath = os.path.join(cogs_dir, filename)
-                    with open(filepath, 'r', encoding='utf-8') as f:
-                        try:
-                            tree = ast.parse(f.read(), filename=filename)
-                            for node in ast.walk(tree):
-                                if isinstance(node, ast.Import):
-                                    for alias in node.names:
-                                        pkg = alias.name.split('.')[0]
-                                        # ADD FILTER HERE
-                                        if pkg in STD_LIB_MODULES or pkg == 'modules':
-                                            continue
-                                        requirements.add(pkg)
-                                elif isinstance(node, ast.ImportFrom):
-                                    if node.module:
-                                        pkg = node.module.split('.')[0]
-                                        # ADD FILTER HERE
-                                        if pkg in STD_LIB_MODULES or pkg == 'modules':
-                                            continue
-                                        requirements.add(pkg)
-                        except Exception as e:
-                            print(f"{YELLOW}Warning: Failed to parse imports from {filename}: {e}{RESET}")
-        else:
-            print(f"{YELLOW}Cogs directory not found at {cogs_dir}, skipping scan.{RESET}")
-    installed_packages = {pkg.key for pkg in pkg_resources.working_set}
+
+    cogs_dir = os.path.abspath(os.path.join(parent_dir, '..', 'cogs'))
+    if os.path.isdir(cogs_dir):
+        for filename in os.listdir(cogs_dir):
+            if filename.endswith('.py'):
+                filepath = os.path.join(cogs_dir, filename)
+                with open(filepath, 'r', encoding='utf-8') as f:
+                    try:
+                        tree = ast.parse(f.read(), filename=filename)
+                        for node in ast.walk(tree):
+                            if isinstance(node, ast.Import):
+                                for alias in node.names:
+                                    pkg = alias.name.split('.')[0]
+                                    if pkg in STD_LIB_MODULES or pkg == 'modules':
+                                        continue
+                                    requirements.add(pkg)
+                            elif isinstance(node, ast.ImportFrom):
+                                if node.module:
+                                    pkg = node.module.split('.')[0]
+                                    if pkg in STD_LIB_MODULES or pkg == 'modules':
+                                        continue
+                                    requirements.add(pkg)
+                    except Exception as e:
+                        print(f"{YELLOW}Warning: Failed to parse imports from {filename}: {e}{RESET}")
+    else:
+        print(f"{YELLOW}Cogs directory not found at {cogs_dir}, skipping scan.{RESET}")
+
+    installed_packages = {dist.metadata['Name'].lower() for dist in importlib.metadata.distributions()}
     missing = []
+
     for req in sorted(requirements):
         if req in STD_LIB_MODULES or req == 'modules':
             print(f"{GREEN}STD LIB / LOCAL{RESET} {req} (skipped check)")
             continue
-        check_name = PACKAGE_ALIASES.get(req, req)
-        try:
-            pkg_resources.require(check_name)
+
+        check_name = PACKAGE_ALIASES.get(req, req).lower()
+
+        if check_name in installed_packages:
             print(f"[{GREEN} OK {RESET}] {check_name}")
-        except pkg_resources.DistributionNotFound:
+        else:
             print(f"[ {RED}MISSING{RESET} ] {check_name} is not installed")
             missing.append(check_name)
-        except pkg_resources.VersionConflict as e:
-            print(f"[ {YELLOW}VERSION CONFLICT{RESET} ]{check_name} -> {e.report()}")
-            missing.append(check_name)
+
     if missing:
-        print("\nMissing or conflicting packages detected:")
+        print("\nMissing packages detected:")
         for pkg in missing:
             print(f"  - {pkg}")
         print(f"Telling goober central at {VERSION_URL}")
@@ -88,12 +93,13 @@ def check_requirements():
             "slash_commands": f"{slash_commands_enabled}\n\n**Error**\nMissing packages have been detected, Failed to start",
             "token": gooberTOKEN
         }
-            # Send ping to server
-        response = requests.post(VERSION_URL+"/ping", json=payload)
+        try:
+            response = requests.post(VERSION_URL + "/ping", json=payload)
+        except Exception as e:
+            print(f"{RED}Failed to contact {VERSION_URL}: {e}{RESET}")
         sys.exit(1)
     else:
         print("\nAll requirements are satisfied.")
-
 
 def check_latency():
     

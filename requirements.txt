@@ -6,4 +6,3 @@ psutil
 better_profanity
 python-dotenv
 ping3
-setuptools
