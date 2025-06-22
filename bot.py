@@ -25,11 +25,15 @@ from modules.translations import *
 from modules.markovmemory import *
 from modules.version import *
 from modules.sentenceprocessing import *
+from modules.prestartchecks import start_checks
+from modules.unhandledexception import handle_exception
 from discord.ext import commands, tasks
 from discord import app_commands
+sys.excepthook = handle_exception
 
 # Print splash text and check for updates
 print(splashtext)  # Print splash text (from modules/globalvars.py)
+start_checks()
 check_for_update()  # Check for updates (from modules/version.py)
 launched = False
 
@@ -111,6 +115,7 @@ used_words = set()
 @bot.event
 async def on_ready():
     global launched
+    global slash_commands_enabled
     folder_name = "cogs"
     if launched == True:
         return
@@ -145,6 +150,24 @@ async def on_ready():
 
 # Load positive GIF URLs from environment variable
 positive_gifs = os.getenv("POSITIVE_GIFS").split(',')
+
+@bot.event
+async def on_command_error(ctx, error):
+    from modules.unhandledexception import handle_exception
+    
+    if isinstance(error, commands.CommandInvokeError):
+        original = error.original
+        handle_exception(
+            type(original), original, original.__traceback__, 
+            context=f"Command: {ctx.command} | User: {ctx.author}"
+        )
+    else:
+        handle_exception(
+            type(error), error, error.__traceback__, 
+            context=f"Command: {ctx.command} | User: {ctx.author}"
+        )
+
+
 
 # Command: Retrain the Markov model from memory
 @bot.hybrid_command(description=f"{get_translation(LOCALE, 'command_desc_retrain')}")
