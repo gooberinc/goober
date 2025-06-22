@@ -1,55 +1,60 @@
+import os
+import re
+import json
+import time
+import random
+import shutil
+import traceback
+import subprocess
+import requests
+import psutil
+
 import discord
 from discord.ext import commands, tasks
 from discord import app_commands
-import json
-import random
-import os
-import time
-import re
-import os
-import requests
-import subprocess
-import psutil
-from better_profanity import profanity
-import traceback
-import shutil
+
 import nltk
 from nltk.data import find
 from nltk import download
+
+from better_profanity import profanity
+
 from modules.globalvars import *
 from modules.central import ping_server
 from modules.translations import *
 from modules.markovmemory import *
 from modules.version import *
 from modules.sentenceprocessing import *
+from discord.ext import commands, tasks
+from discord import app_commands
 
-print(splashtext) # you can use https://patorjk.com/software/taag/ for 3d text or just remove this entirely
-check_for_update()
+# Print splash text and check for updates
+print(splashtext)  # Print splash text (from modules/globalvars.py)
+check_for_update()  # Check for updates (from modules/version.py)
 launched = False
 
+# Ensure required NLTK resources are available
 def check_resources():
+    # Check for required NLTK resources and download if missing
     resources = {
         'vader_lexicon': 'sentiment/vader_lexicon',
         'punkt_tab': 'tokenizers/punkt',
     }
-    
     for resource, path in resources.items():
         try:
-            find(path)
+            find(path)  # find is from nltk.data
             print(f"{resource} is already installed.")
         except LookupError:
-            print(f"{resource} is not installed. Downloading now...")
-            download(resource)
+            download(resource)  # download is from nltk
 
 check_resources()
 
-
-
+# Download locale JSON files if not present
 def download_json():
+    # Download the locale JSON file from GitHub if not present
     locales_dir = "locales"
     response = requests.get(f"https://raw.githubusercontent.com/gooberinc/goober/refs/heads/main/locales/{LOCALE}.json")
     if response.status_code == 200:
-
         if not os.path.exists(locales_dir):
             os.makedirs(locales_dir)
         file_path = os.path.join(locales_dir, f"{LOCALE}.json")
@@ -58,9 +63,7 @@ def download_json():
         else:
             with open(file_path, "w", encoding="utf-8") as file:
                 file.write(response.text)
-
     if not os.path.exists(os.path.join(locales_dir, "en.json")):
-        
         response = requests.get(f"https://raw.githubusercontent.com/gooberinc/goober/refs/heads/main/locales/en.json")
         if response.status_code == 200:
             with open(os.path.join(locales_dir, "en.json"), "w", encoding="utf-8") as file:
@@ -68,28 +71,33 @@ def download_json():
 
 download_json()
 
+# Dynamically load all cogs (extensions) from the cogs folder
 async def load_cogs_from_folder(bot, folder_name="cogs"):
+    # Loads all Python files in the cogs folder as Discord bot extensions
     for filename in os.listdir(folder_name):
         if filename.endswith(".py") and not filename.startswith("_"):
             cog_name = filename[:-3]
             try:
                 await bot.load_extension(f"{folder_name}.{cog_name}")
-                print(f"{GREEN}{get_translation(LOCALE, 'loaded_cog')} {cog_name}{RESET}")
+                print(f"{GREEN}{get_translation(LOCALE, 'loaded_cog')} {cog_name}{RESET}")  # get_translation from modules/translations.py
             except Exception as e:
                 print(f"{RED}{get_translation(LOCALE, 'cog_fail')} {cog_name} {e}{RESET}")
                 traceback.print_exc()
 
-
 currenthash = ""
 
-
-
+# Set up Discord bot intents and create bot instance
 intents = discord.Intents.default()
-
 intents.messages = True
 intents.message_content = True
-bot = commands.Bot(command_prefix=PREFIX, intents=intents, allowed_mentions=discord.AllowedMentions(everyone=False, roles=False, users=False, replied_user=True))
-memory = load_memory() 
+bot = commands.Bot(
+    command_prefix=PREFIX,
+    intents=intents,
+    allowed_mentions=discord.AllowedMentions(everyone=False, roles=False, users=False, replied_user=True)
+)
+
+# Load memory and Markov model for text generation
+memory = load_memory()
 markov_model = load_markov_model()
 if not markov_model:
     print(f"{get_translation(LOCALE, 'no_model')}")
@@ -99,6 +107,7 @@ if not markov_model:
 generated_sentences = set()
 used_words = set()
 
+# Event: Called when the bot is ready
 @bot.event
 async def on_ready():
     global launched
@@ -109,16 +118,21 @@ async def on_ready():
         os.makedirs(folder_name)
         print(f"{GREEN}{get_translation(LOCALE, 'folder_created').format(folder_name=folder_name)}{RESET}")
     else:
-       print(f"{DEBUG}{get_translation(LOCALE, 'folder_exists').format(folder_name=folder_name)}{RESET}")
-    markov_model = train_markov_model(memory)
-    await load_cogs_from_folder(bot)
-    global slash_commands_enabled
-    print(f"{GREEN}{get_translation(LOCALE, 'logged_in')} {bot.user}{RESET}")
+        print(f"{DEBUG}{get_translation(LOCALE, 'folder_exists').format(folder_name=folder_name)}{RESET}")
     try:
         synced = await bot.tree.sync()
         print(f"{GREEN}{get_translation(LOCALE, 'synced_commands')} {len(synced)} {get_translation(LOCALE, 'synced_commands2')} {RESET}")
         slash_commands_enabled = True
-        ping_server()
+        ping_server()  # ping_server from modules/central.py
+        print(f"{GREEN}{get_translation(LOCALE, 'started').format()}{RESET}")
+    except discord.errors.Forbidden as perm_error:
+        print(f"{RED}Permission error while syncing commands: {perm_error}{RESET}")
+        print(f"{RED}Make sure the bot has the 'applications.commands' scope and is invited with the correct permissions.{RESET}")
+        quit()
+    except Exception as e:
+        print(f"{RED}{get_translation(LOCALE, 'fail_commands_sync')} {e}{RESET}")
+        traceback.print_exc()
+        quit()
         print(f"{GREEN}{get_translation(LOCALE, 'started').format()}{RESET}")
     except Exception as e:
         print(f"{RED}{get_translation(LOCALE, 'fail_commands_sync')} {e}{RESET}")
@@ -129,17 +143,16 @@ async def on_ready():
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=f"{song}"))
     launched = True
 
-
+# Load positive GIF URLs from environment variable
 positive_gifs = os.getenv("POSITIVE_GIFS").split(',')
 
-
-
+# Command: Retrain the Markov model from memory
 @bot.hybrid_command(description=f"{get_translation(LOCALE, 'command_desc_retrain')}")
 async def retrain(ctx):
     if ctx.author.id != ownerid:
         return
 
-    message_ref = await send_message(ctx, f"{get_translation(LOCALE, 'command_markov_retrain')}")
+    message_ref = await send_message(ctx, f"{get_translation(LOCALE, 'command_markov_retrain')}")  # send_message from modules/sentenceprocessing.py
     try:
         with open(MEMORY_FILE, 'r') as f:
             memory = json.load(f)
@@ -159,12 +172,12 @@ async def retrain(ctx):
             await send_message(ctx, f"{get_translation(LOCALE, 'command_markov_retraining').format(processed_data=processed_data, data_size=data_size)}", edit=True, message_reference=processing_message_ref)
 
     global markov_model
-    
     markov_model = train_markov_model(memory)
     save_markov_model(markov_model)
 
     await send_message(ctx, f"{get_translation(LOCALE, 'command_markov_retrain_successful').format(data_size=data_size)}", edit=True, message_reference=processing_message_ref)
 
+# Command: Generate a sentence using the Markov model
 @bot.hybrid_command(description=f"{get_translation(LOCALE, 'command_desc_talk')}")
 async def talk(ctx, sentence_size: int = 5):
     if not markov_model:
@@ -188,8 +201,8 @@ async def talk(ctx, sentence_size: int = 5):
 
     if response:
         cleaned_response = re.sub(r'[^\w\s]', '', response).lower()
-        coherent_response = rephrase_for_coherence(cleaned_response)
-        if random.random() < 0.9 and is_positive(coherent_response):
+        coherent_response = rephrase_for_coherence(cleaned_response) 
+        if random.random() < 0.9 and is_positive(coherent_response): 
             gif_url = random.choice(positive_gifs)
             combined_message = f"{coherent_response}\n[jif]({gif_url})"
         else:
@@ -200,10 +213,10 @@ async def talk(ctx, sentence_size: int = 5):
     else:
         await send_message(ctx, f"{get_translation(LOCALE, 'command_talk_generation_fail')}")
 
-
+# Remove default help command to use custom help
 bot.help_command = None
 
-
+# Command: Show help information
 @bot.hybrid_command(description=f"{get_translation(LOCALE, 'command_desc_help')}")
 async def help(ctx):
     embed = discord.Embed(
@@ -232,41 +245,48 @@ async def help(ctx):
 
     await send_message(ctx, embed=embed)
 
+# Event: Called on every message
 @bot.event
 async def on_message(message):
     global memory, markov_model, last_random_talk_time
 
+    # Ignore bot messages
     if message.author.bot:
         return
 
+    # Ignore messages from blacklisted users
     if str(message.author.id) in BLACKLISTED_USERS:
         return
 
+    # Process commands if message starts with a command prefix
     if message.content.startswith((f"{PREFIX}talk", f"{PREFIX}mem", f"{PREFIX}help", f"{PREFIX}stats", f"{PREFIX}")):
         print(f"{get_translation(LOCALE, 'command_ran').format(message=message)}")
         await bot.process_commands(message)
         return
 
-    if profanity.contains_profanity(message.content):
+    # Ignore messages with profanity
+    if profanity.contains_profanity(message.content):  # profanity from better_profanity
         return
 
+    # Add user messages to memory for training if enabled
     if message.content:
         if not USERTRAIN_ENABLED:
             return
-        formatted_message = append_mentions_to_18digit_integer(message.content)
-        cleaned_message = preprocess_message(formatted_message)
+        formatted_message = append_mentions_to_18digit_integer(message.content)  # append_mentions_to_18digit_integer from modules/sentenceprocessing.py
+        cleaned_message = preprocess_message(formatted_message)  # preprocess_message from modules/sentenceprocessing.py
         if cleaned_message:
             memory.append(cleaned_message)
-            save_memory(memory)
+            save_memory(memory)  # save_memory from modules/markovmemory.py
 
-    # process any commands in the message
+    # Process any commands in the message
     await bot.process_commands(message)
 
-
+# Event: Called on every interaction (slash command, etc.)
 @bot.event
 async def on_interaction(interaction):
-        print(f"{get_translation(LOCALE, 'command_ran_s').format(interaction=interaction)}{interaction.data['name']}")
+    print(f"{get_translation(LOCALE, 'command_ran_s').format(interaction=interaction)}{interaction.data['name']}")
 
+# Global check: Block blacklisted users from running commands
 @bot.check
 async def block_blacklisted(ctx):
     if str(ctx.author.id) in BLACKLISTED_USERS:
@@ -283,6 +303,7 @@ async def block_blacklisted(ctx):
         return False
     return True
 
+# Command: Show bot latency
 @bot.hybrid_command(description=f"{get_translation(LOCALE, 'command_desc_ping')}")
 async def ping(ctx):
     await ctx.defer()
@@ -300,11 +321,12 @@ async def ping(ctx):
 
     await ctx.send(embed=LOLembed)
 
+# Command: Show about information
 @bot.hybrid_command(description=f"{get_translation(LOCALE, 'command_about_desc')}")
 async def about(ctx):
     print("-----------------------------------\n\n")
     try:
-        check_for_update()
+        check_for_update()  # check_for_update from modules/version.py
     except Exception as e:
         pass
     print("-----------------------------------")
@@ -314,13 +336,14 @@ async def about(ctx):
 
     await send_message(ctx, embed=embed)
 
+# Command: Show bot statistics (admin only)
 @bot.hybrid_command(description="stats")
 async def stats(ctx):
     if ctx.author.id != ownerid: 
         return
     print("-----------------------------------\n\n")
     try:
-        check_for_update()
+        check_for_update()  # check_for_update from modules/version.py
     except Exception as e:
         pass
     print("-----------------------------------")
@@ -336,6 +359,7 @@ async def stats(ctx):
  
     await send_message(ctx, embed=embed)
 
+# Command: Upload memory.json to litterbox.catbox.moe and return the link
 @bot.hybrid_command()
 async def mem(ctx):
     if showmemenabled != "true":
@@ -345,8 +369,11 @@ async def mem(ctx):
     print(memorylitter)
     await send_message(ctx, memorylitter.stdout.strip())
 
+# Helper: Improve sentence coherence (simple capitalization fix)
 def improve_sentence_coherence(sentence):
+    # Capitalizes "i" to "I" in the sentence
     sentence = sentence.replace(" i ", " I ")
     return sentence
 
+# Start the bot
 bot.run(TOKEN)
