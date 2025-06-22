@@ -3,7 +3,6 @@ import os
 import psutil
 import sys
 import subprocess
-import pkg_resources
 import ast
 import requests
 import importlib.metadata
