@@ -15,7 +15,7 @@
     "synced_commands": "Synchronisé",
     "synced_commands2": "commandes !",
     "fail_commands_sync": "Échec de la synchronisation des commandes :",
-    "started": "Goober a démarré !",
+    "started": "{name} a démarré !",
     "name_check": "Erreur lors de la vérification de la disponibilité du nom :",
     "name_taken": "Le nom est déjà pris. Veuillez choisir un autre nom.",
     "name_check2": "Erreur lors de la vérification de la disponibilité du nom :",

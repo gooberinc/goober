@@ -13,7 +13,7 @@
     "synced_commands": "Sincronizado",
     "synced_commands2": "comandos!",
     "fail_commands_sync": "Error al sincronizar comandos:",
-    "started": "Goober ha empezado!",
+    "started": "{name} ha empezado!",
     "name_check": "Error al comprobar la disponibilidad del nombre:", 
     "name_taken": "El nombre ya está en uso. Elija otro.", 
     "name_check2": "Error durante la comprobacion de disponibilidad del nombre:", 

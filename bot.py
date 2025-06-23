@@ -115,6 +115,7 @@ used_words = set()
 async def on_ready():
     global launched
     global slash_commands_enabled
+    global NAME
     folder_name = "cogs"
     if launched == True:
         return
@@ -129,7 +130,7 @@ async def on_ready():
         print(f"{GREEN}{get_translation(LOCALE, 'synced_commands')} {len(synced)} {get_translation(LOCALE, 'synced_commands2')} {RESET}")
         slash_commands_enabled = True
         ping_server()  # ping_server from modules/central.py
-        print(f"{GREEN}{get_translation(LOCALE, 'started').format()}{RESET}")
+        print(f"{GREEN}{get_translation(LOCALE, 'started').format(NAME=NAME)}{RESET}")
     except discord.errors.Forbidden as perm_error:
         print(f"{RED}Permission error while syncing commands: {perm_error}{RESET}")
         print(f"{RED}Make sure the bot has the 'applications.commands' scope and is invited with the correct permissions.{RESET}")
@@ -138,7 +139,7 @@ async def on_ready():
         print(f"{RED}{get_translation(LOCALE, 'fail_commands_sync')} {e}{RESET}")
         traceback.print_exc()
         quit()
-        print(f"{GREEN}{get_translation(LOCALE, 'started').format()}{RESET}")
+        print(f"{GREEN}{get_translation(LOCALE, 'started').format(NAME=NAME)}{RESET}")
     except Exception as e:
         print(f"{RED}{get_translation(LOCALE, 'fail_commands_sync')} {e}{RESET}")
         traceback.print_exc()
