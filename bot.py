@@ -350,10 +350,7 @@ async def ping(ctx):
 @bot.hybrid_command(description=f"{get_translation(LOCALE, 'command_about_desc')}")
 async def about(ctx):
     print("-----------------------------------\n\n")
-    try:
-        check_for_update()  # check_for_update from modules/version.py
-    except Exception as e:
-        pass
+    latest_version = check_for_update()  # check_for_update from modules/version.py
     print("-----------------------------------")
     embed = discord.Embed(title=f"{get_translation(LOCALE, 'command_about_embed_title')}", description="", color=discord.Color.blue())
     embed.add_field(name=f"{get_translation(LOCALE, 'command_about_embed_field1')}", value=f"{NAME}", inline=False)
@@ -367,10 +364,7 @@ async def stats(ctx):
     if ctx.author.id != ownerid: 
         return
     print("-----------------------------------\n\n")
-    try:
-        check_for_update()  # check_for_update from modules/version.py
-    except Exception as e:
-        pass
+    latest_version = check_for_update()  # check_for_update from modules/version.py
     print("-----------------------------------")
     memory_file = 'memory.json'
     file_size = os.path.getsize(memory_file)

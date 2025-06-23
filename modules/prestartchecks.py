@@ -5,10 +5,11 @@ import sys
 import subprocess
 import ast
 import requests
+import re
 import importlib.metadata
 
 from modules.globalvars import *
-from ping3 import ping
+
 
 def check_requirements():
     STD_LIB_MODULES = {
@@ -101,16 +102,43 @@ def check_requirements():
         print("\nAll requirements are satisfied.")
 
 def check_latency():
-    
-    host = "1.1.1.1" # change this to google later
-    latency = ping(host)
+    host = "1.1.1.1"
 
-    if latency is not None:
-        print(f"Ping to {host}: {latency * 1000:.2f} ms")
-        if latency * 1000 > 300:
-            print(f"{YELLOW}High latency detected! You may experience delays in response times.{RESET}")
+    system = platform.system()
+    if system == "Windows":
+        cmd = ["ping", "-n", "1", "-w", "1000", host]
+        latency_pattern = r"Average = (\d+)ms"
     else:
-        print("Ping failed.")
+        cmd = ["ping", "-c", "1", "-W", "1", host]
+        latency_pattern = r"time[=<]\s*([\d\.]+)\s*ms"
+
+    try:
+        result = subprocess.run(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True
+        )
+
+        if result.returncode == 0:
+            print(result.stdout)
+
+            # Try to extract latency
+            match = re.search(latency_pattern, result.stdout)
+            if match:
+                latency_ms = float(match.group(1))
+                print(f"Ping to {host}: {latency_ms:.2f} ms")
+                if latency_ms > 300:
+                    print(f"{YELLOW}High latency detected! You may experience delays in response times.{RESET}")
+            else:
+                print(f"{YELLOW}Could not parse latency.{RESET}")
+
+        else:
+            print(result.stderr)
+            print(f"{RED}Ping to {host} failed.{RESET}")
+
+    except Exception as e:
+        print(f"{RED}Error running ping: {e}{RESET}")
 
 def check_memory():
     try:

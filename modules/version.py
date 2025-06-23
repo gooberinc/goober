@@ -75,3 +75,4 @@ def check_for_update():
     elif local_version == latest_version:
         print(f"{GREEN}{get_translation(LOCALE, 'latest_version')} {local_version}{RESET}")
         print(f"{get_translation(LOCALE, 'latest_version2').format(VERSION_URL=VERSION_URL)}\n\n")
+    return latest_version
