@@ -5,3 +5,4 @@ requests
 psutil
 better_profanity
 python-dotenv
+pillow

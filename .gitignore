@@ -6,3 +6,4 @@ memory.json
 *.pkl
 memory.json
 venv/
+output.png

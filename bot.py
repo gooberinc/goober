@@ -12,6 +12,7 @@ import psutil
 import discord
 from discord.ext import commands, tasks
 from discord import app_commands
+from discord import Colour
 
 import nltk
 from nltk.data import find
@@ -26,6 +27,7 @@ from modules.version import *
 from modules.sentenceprocessing import *
 from modules.prestartchecks import start_checks
 from modules.unhandledexception import handle_exception
+from modules.image import gen_image
 from discord.ext import commands, tasks
 from discord import app_commands
 sys.excepthook = handle_exception
@@ -246,11 +248,21 @@ bot.help_command = None
 
 # Command: Show help information
 @bot.hybrid_command(description=f"{get_translation(LOCALE, 'command_desc_help')}")
+async def image(ctx):
+    await gen_image()
+    await send_message(ctx, file=discord.File("output.png"))
+
+
+# Remove default help command to use custom help
+bot.help_command = None
+
+# Command: Show help information
+@bot.hybrid_command(description=f"{get_translation(LOCALE, 'command_desc_help')}")
 async def help(ctx):
     embed = discord.Embed(
         title=f"{get_translation(LOCALE, 'command_help_embed_title')}",
         description=f"{get_translation(LOCALE, 'command_help_embed_desc')}",
-        color=discord.Color.blue()
+        color=Colour(0x000000)
     )
 
     command_categories = {
@@ -343,7 +355,7 @@ async def ping(ctx):
             f"{PING_LINE}\n"
             f"`{get_translation(LOCALE, 'command_ping_embed_desc')}: {latency}ms`\n"
         ),
-        color=discord.Color.blue()
+        color=Colour(0x000000)
     )
     LOLembed.set_footer(text=f"{get_translation(LOCALE, 'command_ping_footer')} {ctx.author.name}", icon_url=ctx.author.avatar.url)
 
@@ -355,7 +367,7 @@ async def about(ctx):
     print("-----------------------------------\n\n")
     latest_version = check_for_update()  # check_for_update from modules/version.py
     print("-----------------------------------")
-    embed = discord.Embed(title=f"{get_translation(LOCALE, 'command_about_embed_title')}", description="", color=discord.Color.blue())
+    embed = discord.Embed(title=f"{get_translation(LOCALE, 'command_about_embed_title')}", description="", color=Colour(0x000000))
     embed.add_field(name=f"{get_translation(LOCALE, 'command_about_embed_field1')}", value=f"{NAME}", inline=False)
     embed.add_field(name=f"{get_translation(LOCALE, 'command_about_embed_field2name')}", value=f"{get_translation(LOCALE, 'command_about_embed_field2value').format(local_version=local_version, latest_version=latest_version)}", inline=False)
 
@@ -374,7 +386,7 @@ async def stats(ctx):
     
     with open(memory_file, 'r') as file:
         line_count = sum(1 for _ in file)
-    embed = discord.Embed(title=f"{get_translation(LOCALE, 'command_stats_embed_title')}", description=f"{get_translation(LOCALE, 'command_stats_embed_desc')}", color=discord.Color.blue())
+    embed = discord.Embed(title=f"{get_translation(LOCALE, 'command_stats_embed_title')}", description=f"{get_translation(LOCALE, 'command_stats_embed_desc')}", color=Colour(0x000000))
     embed.add_field(name=f"{get_translation(LOCALE, 'command_stats_embed_field1name')}", value=f"{get_translation(LOCALE, 'command_stats_embed_field1value').format(file_size=file_size, line_count=line_count)}", inline=False)
     embed.add_field(name=f"{get_translation(LOCALE, 'command_stats_embed_field2name')}", value=f"{get_translation(LOCALE, 'command_stats_embed_field2value').format(local_version=local_version, latest_version=latest_version)}", inline=False)
     embed.add_field(name=f"{get_translation(LOCALE, 'command_stats_embed_field3name')}", value=f"{get_translation(LOCALE, 'command_stats_embed_field3value').format(NAME=NAME, PREFIX=PREFIX, ownerid=ownerid, cooldown_time=cooldown_time, PING_LINE=PING_LINE, showmemenabled=showmemenabled, USERTRAIN_ENABLED=USERTRAIN_ENABLED, last_random_talk_time=last_random_talk_time, song=song, splashtext=splashtext)}", inline=False)
