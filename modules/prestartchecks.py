@@ -1,10 +1,15 @@
 import time
 import os
-import psutil
 import sys
 import subprocess
 import ast
-import requests
+psutilavaliable = True
+try:
+    import requests
+    import psutil
+except ImportError:
+    psutilavaliable = False
+    print("Missing Requests! and Psutil!")
 import re
 import importlib.metadata
 
@@ -141,6 +146,8 @@ def check_latency():
         print(f"{RED}Error running ping: {e}{RESET}")
 
 def check_memory():
+    if psutilavaliable == False:
+        return
     try:
         memory_info = psutil.virtual_memory()
         total_memory = memory_info.total / (1024 ** 3)
@@ -160,6 +167,8 @@ def check_memory():
         print("psutil is not installed. Memory check skipped.")
 
 def check_cpu():
+    if psutilavaliable == False:
+        return
         print("Measuring CPU usage per core...")
         cpu_per_core = psutil.cpu_percent(interval=1, percpu=True)
         for idx, core_usage in enumerate(cpu_per_core):

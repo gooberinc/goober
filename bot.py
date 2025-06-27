@@ -6,6 +6,16 @@ import random
 import shutil
 import traceback
 import subprocess
+
+
+
+from modules.globalvars import *
+from modules.prestartchecks import start_checks
+
+# Print splash text and check for updates
+print(splashtext)  # Print splash text (from modules/globalvars.py)
+start_checks()
+
 import requests
 import psutil
 
@@ -19,22 +29,19 @@ from nltk.data import find
 from nltk import download
 from better_profanity import profanity
 
-from modules.globalvars import *
+
+from discord.ext import commands, tasks
+from discord import app_commands
+
 from modules.central import ping_server
 from modules.translations import *
 from modules.markovmemory import *
 from modules.version import *
 from modules.sentenceprocessing import *
-from modules.prestartchecks import start_checks
 from modules.unhandledexception import handle_exception
 from modules.image import gen_image
-from discord.ext import commands, tasks
-from discord import app_commands
-sys.excepthook = handle_exception
 
-# Print splash text and check for updates
-print(splashtext)  # Print splash text (from modules/globalvars.py)
-start_checks()
+sys.excepthook = handle_exception
 check_for_update()  # Check for updates (from modules/version.py)
 launched = False
 
