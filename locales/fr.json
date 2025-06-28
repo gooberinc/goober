@@ -77,5 +77,5 @@
     "command_stats_embed_field2name": "Version",
     "command_stats_embed_field2value": "Locale : {local_version} \nDernière : {latest_version}",
     "command_stats_embed_field3name": "Informations variables",
-    "command_stats_embed_field3value": "Nom : {NAME} \nPréfixe : {PREFIX} \nID du propriétaire : {ownerid} \nTemps de recharge : {cooldown_time} \nLigne de ping : {PING_LINE} \nPartage de mémoire activé : {showmemenabled} \nEntraînement utilisateur activé : {USERTRAIN_ENABLED} \nDernier TT aléatoire : {last_random_talk_time} \nChanson : {song} \nTexte de démarrage : ```{splashtext}```"
+    "command_stats_embed_field3value": "Nom : {NAME} \nPréfixe : {PREFIX} \nID du propriétaire : {ownerid} \nTemps de recharge : {cooldown_time} \nLigne de ping : {PING_LINE} \nPartage de mémoire activé : {showmemenabled} \nEntraînement utilisateur activé : {USERTRAIN_ENABLED} \nChanson : {song} \nTexte de démarrage : ```{splashtext}```"
 }

@@ -1,7 +1,5 @@
-import hashlib
 from modules.translations import *
 from modules.globalvars import *
-import traceback
 import requests
 import subprocess
 import sys

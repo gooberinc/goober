@@ -3,13 +3,15 @@ import os
 import sys
 import subprocess
 import ast
+import json
+# import shutil
 psutilavaliable = True
 try:
     import requests
     import psutil
 except ImportError:
     psutilavaliable = False
-    print("Missing Requests! and Psutil!")
+    print("Missing requests and psutil! Please install them using pip: `pip install requests psutil`")
 import re
 import importlib.metadata
 
@@ -169,33 +171,47 @@ def check_memory():
 def check_cpu():
     if psutilavaliable == False:
         return
-        print("Measuring CPU usage per core...")
-        cpu_per_core = psutil.cpu_percent(interval=1, percpu=True)
-        for idx, core_usage in enumerate(cpu_per_core):
-            bar_length = int(core_usage / 5) 
-            bar = '█' * bar_length + '-' * (20 - bar_length)
-            if core_usage > 85:
-                color = RED
-            elif core_usage > 60:
-                color = YELLOW
-            else:
-                color = GREEN
-            print(f"Core {idx}: {color}[{bar}] {core_usage:.2f}%{RESET}")
+    print("Measuring CPU usage per core...")
+    cpu_per_core = psutil.cpu_percent(interval=1, percpu=True)
+    for idx, core_usage in enumerate(cpu_per_core):
+        bar_length = int(core_usage / 5) 
+        bar = '█' * bar_length + '-' * (20 - bar_length)
+        if core_usage > 85:
+            color = RED
+        elif core_usage > 60:
+            color = YELLOW
+        else:
+            color = GREEN
+        print(f"Core {idx}: {color}[{bar}] {core_usage:.2f}%{RESET}")
 
-        total_cpu = sum(cpu_per_core) / len(cpu_per_core)
-        print(f"Total CPU Usage: {total_cpu:.2f}%")
+    total_cpu = sum(cpu_per_core) / len(cpu_per_core)
+    print(f"Total CPU Usage: {total_cpu:.2f}%")
 
-        if total_cpu > 85:
-            print(f"{YELLOW}High average CPU usage: {total_cpu:.2f}%{RESET}")
-        if total_cpu > 95:
-            print(f"{RED}Really high CPU load! System may throttle or hang.{RESET}")
-            sys.exit(1)
+    if total_cpu > 85:
+        print(f"{YELLOW}High average CPU usage: {total_cpu:.2f}%{RESET}")
+    if total_cpu > 95:
+        print(f"{RED}Really high CPU load! System may throttle or hang.{RESET}")
+        sys.exit(1)
 
 def check_memoryjson():
     try:
         print(f"Memory file: {os.path.getsize(MEMORY_FILE) / (1024 ** 2):.2f} MB")
         if os.path.getsize(MEMORY_FILE) > 1_073_741_824:
             print(f"{YELLOW}Memory file is 1GB or higher, consider clearing it to free up space.{RESET}")
+        
+        # Check for corrupted memory.json file
+        try:
+            with open(MEMORY_FILE, 'r', encoding='utf-8') as f:
+                json.load(f)
+        except json.JSONDecodeError as e:
+            print(f"{RED}Memory file is corrupted! JSON decode error: {e}{RESET}")
+            print(f"{YELLOW}Consider backing up and recreating the memory file.{RESET}")
+        except UnicodeDecodeError as e:
+            print(f"{RED}Memory file has encoding issues: {e}{RESET}")
+            print(f"{YELLOW}Consider backing up and recreating the memory file.{RESET}")
+        except Exception as e:
+            print(f"{RED}Error reading memory file: {e}{RESET}")
+            
     except FileNotFoundError:
         print(f"{YELLOW}Memory file not found.{RESET}")
 
@@ -232,13 +248,18 @@ def presskey2skip(timeout):
             termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
 
 def start_checks():
-        print("Running pre-start checks...")
-        check_requirements()
-        check_latency()
-        check_memory()
-        check_memoryjson()
-        check_cpu()
-        print("Continuing in 5 seconds... Press any key to skip.")
-        presskey2skip(5)
-        os.system('cls' if os.name == 'nt' else 'clear')
-        print(splashtext)
+    print("Running pre-start checks...")
+    check_requirements()
+    check_latency()
+    check_memory()
+    check_memoryjson()
+    check_cpu()
+    print("Continuing in 5 seconds... Press any key to skip.")
+    presskey2skip(timeout=5)
+    
+    os.system('cls' if os.name == 'nt' else 'clear')
+    
+    # i decided to experiment with this instead of the above line but it doesn't work too well so that's why i'm not using it
+    # print("\n" * (shutil.get_terminal_size(fallback=(80, 24))).lines, end="")
+    
+    print(splashtext)

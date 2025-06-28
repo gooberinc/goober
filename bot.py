@@ -3,11 +3,8 @@ import re
 import json
 import time
 import random
-import shutil
 import traceback
 import subprocess
-
-
 
 from modules.globalvars import *
 from modules.prestartchecks import start_checks
@@ -17,21 +14,16 @@ print(splashtext)  # Print splash text (from modules/globalvars.py)
 start_checks()
 
 import requests
-import psutil
 
 import discord
-from discord.ext import commands, tasks
-from discord import app_commands
+from discord.ext import commands
 from discord import Colour
 
 import nltk
-from nltk.data import find
-from nltk import download
+import nltk.data
 from better_profanity import profanity
 
-
-from discord.ext import commands, tasks
-from discord import app_commands
+from discord.ext import commands
 
 from modules.central import ping_server
 from modules.translations import *
@@ -54,10 +46,10 @@ def check_resources():
     }
     for resource, path in resources.items():
         try:
-            find(path)  # find is from nltk.data
+            nltk.data.find(path) 
             print(f"{resource} is already installed.")
-        except LookupError:
-            download(resource)  # download is from nltk
+        except Exception:
+            nltk.download(str(resource))
 
 check_resources()
 
@@ -149,19 +141,13 @@ async def on_ready():
         print(f"{RED}{get_translation(LOCALE, 'fail_commands_sync')} {e}{RESET}")
         traceback.print_exc()
         quit()
-        print(f"{GREEN}{get_translation(LOCALE, 'started').format(name=NAME)}{RESET}")
-
-    except Exception as e:
-        print(f"{RED}{get_translation(LOCALE, 'fail_commands_sync')} {e}{RESET}")
-        traceback.print_exc()
-        quit()
     if not song:
         return  
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=f"{song}"))
     launched = True
 
 # Load positive GIF URLs from environment variable
-positive_gifs = os.getenv("POSITIVE_GIFS").split(',')
+positive_gifs: list[str] = os.getenv("POSITIVE_GIFS", "").split(',')
 
 @bot.event
 async def on_command_error(ctx, error):
@@ -295,7 +281,7 @@ async def help(ctx):
 # Event: Called on every message
 @bot.event
 async def on_message(message):
-    global memory, markov_model, last_random_talk_time
+    global memory, markov_model
 
     # Ignore bot messages
     if message.author.bot:
@@ -396,7 +382,7 @@ async def stats(ctx):
     embed = discord.Embed(title=f"{get_translation(LOCALE, 'command_stats_embed_title')}", description=f"{get_translation(LOCALE, 'command_stats_embed_desc')}", color=Colour(0x000000))
     embed.add_field(name=f"{get_translation(LOCALE, 'command_stats_embed_field1name')}", value=f"{get_translation(LOCALE, 'command_stats_embed_field1value').format(file_size=file_size, line_count=line_count)}", inline=False)
     embed.add_field(name=f"{get_translation(LOCALE, 'command_stats_embed_field2name')}", value=f"{get_translation(LOCALE, 'command_stats_embed_field2value').format(local_version=local_version, latest_version=latest_version)}", inline=False)
-    embed.add_field(name=f"{get_translation(LOCALE, 'command_stats_embed_field3name')}", value=f"{get_translation(LOCALE, 'command_stats_embed_field3value').format(NAME=NAME, PREFIX=PREFIX, ownerid=ownerid, cooldown_time=cooldown_time, PING_LINE=PING_LINE, showmemenabled=showmemenabled, USERTRAIN_ENABLED=USERTRAIN_ENABLED, last_random_talk_time=last_random_talk_time, song=song, splashtext=splashtext)}", inline=False)
+    embed.add_field(name=f"{get_translation(LOCALE, 'command_stats_embed_field3name')}", value=f"{get_translation(LOCALE, 'command_stats_embed_field3value').format(NAME=NAME, PREFIX=PREFIX, ownerid=ownerid, cooldown_time=cooldown_time, PING_LINE=PING_LINE, showmemenabled=showmemenabled, USERTRAIN_ENABLED=USERTRAIN_ENABLED, song=song, splashtext=splashtext)}", inline=False)
  
     await send_message(ctx, embed=embed)
 

@@ -45,6 +45,7 @@ async def gen_image(sentence_size=5, max_attempts=10):
         midpoint = len(words)//2
         return " ".join(words[:midpoint]), " ".join(words[midpoint:])
 
+    coherent_response = "no text generated"
     attempt = 0
     while attempt < max_attempts:
         chosen_image_path = os.path.join(images_folder, random.choice(image_files))
@@ -97,8 +98,7 @@ async def gen_image(sentence_size=5, max_attempts=10):
         if top_height <= max_text_height and bottom_height <= max_text_height:
             # top text
             draw_text_with_outline(draw, top_text, (width - (top_bbox[2]-top_bbox[0])) / 2, 0, font)
-            # bottom text
-            y_bottom = height - bottom_height
+            y_bottom = height - bottom_height - int(height * 0.04)
             draw_text_with_outline(draw, bottom_text, (width - (bottom_bbox[2]-bottom_bbox[0])) / 2, y_bottom, font)
             img.save("output.png")
             return
