@@ -1,2 +1,1 @@
-- fix missing translations in some cases
-- revamp wiki
+- update to latest version of goober
