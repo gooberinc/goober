@@ -17,6 +17,9 @@ def is_remote_ahead(branch='main', remote='origin'):
 
 # Automatically update the local repository if the remote is ahead
 def auto_update(branch='main', remote='origin'):
+    if launched == True:
+        print("I've already started! Im not updating...")
+        return
     if AUTOUPDATE != "True":
         pass  # Auto-update is disabled
     if is_remote_ahead(branch, remote):

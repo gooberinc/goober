@@ -5,6 +5,8 @@ import time
 import random
 import traceback
 import subprocess
+import tempfile
+import shutil
 
 from modules.globalvars import *
 from modules.prestartchecks import start_checks
@@ -35,7 +37,6 @@ from modules.image import gen_image
 
 sys.excepthook = handle_exception
 check_for_update()  # Check for updates (from modules/version.py)
-launched = False
 
 # Ensure required NLTK resources are available
 def check_resources():
@@ -240,10 +241,60 @@ async def talk(ctx, sentence_size: int = 5):
 bot.help_command = None
 
 # Command: Show help information
+
+import uuid
+import random
+
+
 @bot.hybrid_command(description=f"{get_translation(LOCALE, 'command_desc_help')}")
 async def image(ctx):
-    await gen_image()
-    await send_message(ctx, file=discord.File("output.png"))
+    assets_folder = "assets/images"
+    temp_input = None
+
+    def get_random_asset_image():
+        files = [f for f in os.listdir(assets_folder) if f.lower().endswith(('.png', '.jpg', '.jpeg', '.webp'))]
+        if not files:
+            return None
+        return os.path.join(assets_folder, random.choice(files))
+
+    if ctx.message.attachments:
+        attachment = ctx.message.attachments[0]
+        if attachment.content_type and attachment.content_type.startswith("image/"):
+            ext = os.path.splitext(attachment.filename)[1]
+            temp_input = f"tempy{ext}"
+            await attachment.save(temp_input)
+            input_path = temp_input
+        else:
+            fallback_image = get_random_asset_image()
+            if fallback_image is None:
+                await ctx.reply("No image available to process.")
+                return
+            temp_input = tempfile.mktemp(suffix=os.path.splitext(fallback_image)[1])
+            shutil.copy(fallback_image, temp_input)
+            input_path = temp_input
+    else:
+        fallback_image = get_random_asset_image()
+        if fallback_image is None:
+            await ctx.reply("No image available to process.")
+            return
+        # got lazy here
+        temp_input = tempfile.mktemp(suffix=os.path.splitext(fallback_image)[1])
+        shutil.copy(fallback_image, temp_input)
+        input_path = temp_input
+
+    output_path = await gen_image(input_path)
+
+    if output_path is None or not os.path.isfile(output_path):
+        if temp_input and os.path.exists(temp_input):
+            os.remove(temp_input)
+        await ctx.reply("Failed to generate text on the image.")
+        return
+
+    await ctx.send(file=discord.File(output_path))
+
+    if temp_input and os.path.exists(temp_input):
+        os.remove(temp_input)
+
 
 
 # Remove default help command to use custom help
@@ -259,7 +310,7 @@ async def help(ctx):
     )
 
     command_categories = {
-        f"{get_translation(LOCALE, 'command_help_categories_general')}": ["mem", "talk", "about", "ping"],
+        f"{get_translation(LOCALE, 'command_help_categories_general')}": ["mem", "talk", "about", "ping", "image"],
         f"{get_translation(LOCALE, 'command_help_categories_admin')}": ["stats", "retrain"]
     }
 
