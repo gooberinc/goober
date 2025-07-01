@@ -1,4 +1,5 @@
 {
+    "env_file_not_found": "The .env file was not found! Please create one with the required variables.",
     "error_fetching_active_users": "Error fetching active users: {error}",
     "error_sending_alive_ping": "Error sending alive ping: {error}",
     "already_started": "I've already started! I'm not updating...",

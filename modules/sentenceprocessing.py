@@ -15,7 +15,7 @@ def check_resources():
     for resource, path in resources.items():
         try:
             nltk.data.find(path) 
-            print(f"{resource} is already installed.")
+            logger.info(f"{resource} is already installed.")
         except Exception:
             nltk.download(str(resource))
 
@@ -30,14 +30,14 @@ analyzer = SentimentIntensityAnalyzer()
 def is_positive(sentence):
     """
     Determines if the sentiment of the sentence is positive.
-    Prints debug information and returns True if sentiment score > 0.1.
+    logger.infos debug information and returns True if sentiment score > 0.1.
     """
     scores = analyzer.polarity_scores(sentence)
     sentiment_score = scores['compound']
 
-    # Print debug message with sentiment score
+    # logger.info debug message with sentiment score
     debug_message = f"{DEBUG}{get_translation(LOCALE, 'sentence_positivity')} {sentiment_score}{RESET}"
-    print(debug_message) 
+    logger.info(debug_message) 
 
     return sentiment_score > 0.1
 

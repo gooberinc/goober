@@ -249,6 +249,11 @@ def start_checks():
     check_memory()
     check_memoryjson()
     check_cpu()
+    if os.path.exists(".env"):
+        pass
+    else:
+        print(f"{YELLOW}{get_translation(LOCALE, 'env_file_not_found')}{RESET}")
+        sys.exit(1)
     print(get_translation(LOCALE, "continuing_in_seconds").format(seconds=5))
     presskey2skip(timeout=5)
     os.system('cls' if os.name == 'nt' else 'clear')

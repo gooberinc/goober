@@ -1,4 +1,5 @@
 {
+    "env_file_not_found": "Il file .env non è stato trovato! Crea un file con le variabili richieste.",
     "error fetching_active_users": "Errore nel recupero degli utenti attivi:",
     "error_sending_alive_ping": "Errore nell'invio di aliveping:",
     "already_started": "Sono già avviato! Non aggiorno...",
@@ -14,7 +15,7 @@
     "cogs_dir_not_found": "Cartella cogs non trovata in {path}, scansione saltata.",
     "std_lib_local_skipped": "LIB STD / LOCALE {package} (controllo saltato)",
     "ok_installed": "OK",
-    "missing_package": "MANCATE",
+    "missing_package": "REQUISITO MANCANTE",
     "missing_package2": "non è installato",
     "missing_packages_detected": "Pacchetti mancanti rilevati:",
     "telling_goober_central": "Segnalazione a goober central su {url}",
