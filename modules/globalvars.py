@@ -39,5 +39,5 @@ arch = platform.machine()
 slash_commands_enabled = False
 launched = False
 latest_version = "0.0.0"
-local_version = "1.0.3"
+local_version = "1.0.4"
 os.environ['gooberlocal_version'] = local_version

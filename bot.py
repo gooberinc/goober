@@ -78,14 +78,14 @@ def download_json():
 download_json()
 
 # Dynamically load all cogs (extensions) from the cogs folder
-async def load_cogs_from_folder(bot, folder_name="cogs"):
-    # Loads all Python files in the cogs folder as Discord bot extensions
+async def load_cogs_from_folder(bot, folder_name="assets/cogs"):
     for filename in os.listdir(folder_name):
         if filename.endswith(".py") and not filename.startswith("_"):
             cog_name = filename[:-3]
+            module_path = folder_name.replace("/", ".").replace("\\", ".") + f".{cog_name}"
             try:
-                await bot.load_extension(f"{folder_name}.{cog_name}")
-                print(f"{GREEN}{get_translation(LOCALE, 'loaded_cog')} {cog_name}{RESET}")  # get_translation from modules/translations.py
+                await bot.load_extension(module_path)
+                print(f"{GREEN}{get_translation(LOCALE, 'loaded_cog')} {cog_name}{RESET}")
             except Exception as e:
                 print(f"{RED}{get_translation(LOCALE, 'cog_fail')} {cog_name} {e}{RESET}")
                 traceback.print_exc()
@@ -166,9 +166,6 @@ async def on_command_error(ctx, error):
             type(error), error, error.__traceback__, 
             context=f"Command: {ctx.command} | User: {ctx.author}"
         )
-
-
-
 
 
 # Command: Retrain the Markov model from memory
@@ -263,7 +260,7 @@ async def image(ctx):
         else:
             fallback_image = get_random_asset_image()
             if fallback_image is None:
-                await ctx.reply("No image available to process.")
+                await ctx.reply(get_translation(LOCALE, "no_image_available"))
                 return
             temp_input = tempfile.mktemp(suffix=os.path.splitext(fallback_image)[1])
             shutil.copy(fallback_image, temp_input)
@@ -283,7 +280,7 @@ async def image(ctx):
     if output_path is None or not os.path.isfile(output_path):
         if temp_input and os.path.exists(temp_input):
             os.remove(temp_input)
-        await ctx.reply("Failed to generate text on the image.")
+        await ctx.reply(get_translation(LOCALE, "failed_generate_image"))
         return
 
     await ctx.send(file=discord.File(output_path))
@@ -373,11 +370,11 @@ async def block_blacklisted(ctx):
         try:
             if isinstance(ctx, discord.Interaction):
                 if not ctx.response.is_done():
-                    await ctx.response.send_message("You are blacklisted.", ephemeral=True)
+                    await ctx.response.send_message(get_translation(LOCALE, "blacklisted"), ephemeral=True)
                 else:
-                    await ctx.followup.send("You are blacklisted.", ephemeral=True)
+                    await ctx.followup.send(get_translation(LOCALE, "blacklisted"), ephemeral=True)
             else:
-                await ctx.send("You are blacklisted.", ephemeral=True)
+                await ctx.send(get_translation(LOCALE, "blacklisted_user"), ephemeral=True)
         except:
             pass
         return False

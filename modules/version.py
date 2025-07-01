@@ -18,18 +18,18 @@ def is_remote_ahead(branch='main', remote='origin'):
 # Automatically update the local repository if the remote is ahead
 def auto_update(branch='main', remote='origin'):
     if launched == True:
-        print("I've already started! Im not updating...")
+        print(get_translation(LOCALE, "already_started"))
         return
     if AUTOUPDATE != "True":
         pass  # Auto-update is disabled
     if is_remote_ahead(branch, remote):
-        print(f"Remote {remote}/{branch} is ahead. Updating...")
+        print(get_translation(LOCALE, "remote_ahead").format(remote=remote, branch=branch))
         pull_result = run_cmd(f'git pull {remote} {branch}')
         print(pull_result)
-        print("Please Restart goober!")
+        print(get_translation(LOCALE, "please_restart"))
         sys.exit(0)
     else:
-        print(f"Local {remote}/{branch} is ahead and/or up to par. Not Updating...")
+        print(get_translation(LOCALE, "local_ahead").format(remote=remote, branch=branch))
 
 # Fetch the latest version info from the update server
 def get_latest_version_info():
@@ -65,7 +65,7 @@ def check_for_update():
 
     # Check if local_version is valid
     if local_version == "0.0.0" or None:
-        print(f"{RED}I cant find the local_version variable! Or its been tampered with and its not an interger!{RESET}")
+        print(f"{RED}{get_translation(LOCALE, 'cant_find_local_version')}{RESET}")
         return
 
     # Compare local and latest versions

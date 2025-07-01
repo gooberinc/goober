@@ -10,7 +10,7 @@ def load_translations():
     """
     translations = {}
     # Get the path to the 'locales' directory (one level up from this file)
-    translations_dir = pathlib.Path(__file__).parent.parent / 'locales'
+    translations_dir = pathlib.Path(__file__).parent.parent / 'assets' / 'locales'
     # Iterate over all files in the 'locales' directory
     for filename in os.listdir(translations_dir):
         if filename.endswith(".json"):
