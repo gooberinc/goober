@@ -22,10 +22,7 @@ import discord
 from discord.ext import commands
 from discord import Colour
 
-import nltk
-import nltk.data
 from better_profanity import profanity
-
 from discord.ext import commands
 
 from modules.central import ping_server
@@ -39,43 +36,7 @@ from modules.image import gen_image
 sys.excepthook = handle_exception
 check_for_update()  # Check for updates (from modules/version.py)
 
-# Ensure required NLTK resources are available
-def check_resources():
-    # Check for required NLTK resources and download if missing
-    resources = {
-        'vader_lexicon': 'sentiment/vader_lexicon',
-        'punkt_tab': 'tokenizers/punkt',
-    }
-    for resource, path in resources.items():
-        try:
-            nltk.data.find(path) 
-            print(f"{resource} is already installed.")
-        except Exception:
-            nltk.download(str(resource))
-
-check_resources()
-
-# Download locale JSON files if not present
-def download_json():
-    # Download the locale JSON file from GitHub if not present
-    locales_dir = "locales"
-    response = requests.get(f"https://raw.githubusercontent.com/gooberinc/goober/refs/heads/main/locales/{LOCALE}.json")
-    if response.status_code == 200:
-        if not os.path.exists(locales_dir):
-            os.makedirs(locales_dir)
-        file_path = os.path.join(locales_dir, f"{LOCALE}.json")
-        if os.path.exists(file_path):
-            return
-        else:
-            with open(file_path, "w", encoding="utf-8") as file:
-                file.write(response.text)
-    if not os.path.exists(os.path.join(locales_dir, "en.json")):
-        response = requests.get(f"https://raw.githubusercontent.com/gooberinc/goober/refs/heads/main/locales/en.json")
-        if response.status_code == 200:
-            with open(os.path.join(locales_dir, "en.json"), "w", encoding="utf-8") as file:
-                file.write(response.text)
-
-download_json()
+# removed since all locales come with goober now
 
 # Dynamically load all cogs (extensions) from the cogs folder
 async def load_cogs_from_folder(bot, folder_name="assets/cogs"):
@@ -122,11 +83,7 @@ async def on_ready():
     folder_name = "cogs"
     if launched == True:
         return
-    if not os.path.exists(folder_name):
-        os.makedirs(folder_name)
-        print(f"{GREEN}{get_translation(LOCALE, 'folder_created').format(folder_name=folder_name)}{RESET}")
-    else:
-        print(f"{DEBUG}{get_translation(LOCALE, 'folder_exists').format(folder_name=folder_name)}{RESET}")
+    #  create folder logic only existed to prevent errors from upgrading from older versions of goober, now got nuked because its been like a billion versions since then
     await load_cogs_from_folder(bot)
     try:
         synced = await bot.tree.sync()

@@ -1,6 +1,26 @@
 import re
 from modules.globalvars import *
 from modules.translations import *
+
+import nltk
+import nltk.data
+
+# Ensure required NLTK resources are available
+def check_resources():
+    # Check for required NLTK resources and download if missing
+    resources = {
+        'vader_lexicon': 'sentiment/vader_lexicon',
+        'punkt_tab': 'tokenizers/punkt',
+    }
+    for resource, path in resources.items():
+        try:
+            nltk.data.find(path) 
+            print(f"{resource} is already installed.")
+        except Exception:
+            nltk.download(str(resource))
+
+check_resources()
+
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 from nltk.tokenize import word_tokenize
 
