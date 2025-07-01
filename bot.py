@@ -7,6 +7,7 @@ import traceback
 import subprocess
 import tempfile
 import shutil
+import uuid
 
 from modules.globalvars import *
 from modules.prestartchecks import start_checks
@@ -241,11 +242,6 @@ async def talk(ctx, sentence_size: int = 5):
 bot.help_command = None
 
 # Command: Show help information
-
-import uuid
-import random
-
-
 @bot.hybrid_command(description=f"{get_translation(LOCALE, 'command_desc_help')}")
 async def image(ctx):
     assets_folder = "assets/images"
