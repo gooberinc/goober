@@ -1,6 +1,7 @@
 discord.py
 markovify
-nltk
+spacy
+spacytextblob
 requests
 psutil
 better_profanity

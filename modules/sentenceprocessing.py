@@ -2,59 +2,43 @@ import re
 from modules.globalvars import *
 from modules.translations import *
 
-import nltk
-import nltk.data
+import spacy
+from spacy.tokens import Doc
+from spacytextblob.spacytextblob import SpacyTextBlob
+nlp = spacy.load("en_core_web_sm")
+nlp.add_pipe("spacytextblob")
+Doc.set_extension("polarity", getter=lambda doc: doc._.blob.polarity)
 
-# Ensure required NLTK resources are available
 def check_resources():
-    # Check for required NLTK resources and download if missing
-    resources = {
-        'vader_lexicon': 'sentiment/vader_lexicon',
-        'punkt_tab': 'tokenizers/punkt',
-    }
-    for resource, path in resources.items():
-        try:
-            nltk.data.find(path) 
-            logger.info(f"{resource} is already installed.")
-        except Exception:
-            nltk.download(str(resource))
+    try:
+        nlp = spacy.load("en_core_web_sm")
+    except OSError:
+        print("spaCy model not found. Downloading en_core_web_sm...")
+        spacy.cli.download("en_core_web_sm")
+        nlp = spacy.load("en_core_web_sm")
+    if "spacytextblob" not in nlp.pipe_names:
+        nlp.add_pipe("spacytextblob")
+    print("spaCy model and spacytextblob are ready.")
 
 check_resources()
 
-from nltk.sentiment.vader import SentimentIntensityAnalyzer
-from nltk.tokenize import word_tokenize
-
-# Initialize the sentiment analyzer
-analyzer = SentimentIntensityAnalyzer()
-
 def is_positive(sentence):
-    """
-    Determines if the sentiment of the sentence is positive.
-    logger.infos debug information and returns True if sentiment score > 0.1.
-    """
-    scores = analyzer.polarity_scores(sentence)
-    sentiment_score = scores['compound']
+    doc = nlp(sentence)
+    sentiment_score = doc._.polarity  # from spacytextblob
 
-    # logger.info debug message with sentiment score
     debug_message = f"{DEBUG}{get_translation(LOCALE, 'sentence_positivity')} {sentiment_score}{RESET}"
-    logger.info(debug_message) 
+    print(debug_message)
 
     return sentiment_score > 0.1
 
 async def send_message(ctx, message=None, embed=None, file=None, edit=False, message_reference=None):
-    """
-    Sends or edits a message in a Discord context.
-    Handles both slash command and regular command contexts.
-    """
     if edit and message_reference:
         try:
-            # Editing the existing message
             await message_reference.edit(content=message, embed=embed)
         except Exception as e:
             await ctx.send(f"{RED}{get_translation(LOCALE, 'edit_fail')} {e}{RESET}")
     else:
         if hasattr(ctx, "respond"):
-            # For slash command contexts
             sent_message = None
             if embed:
                 sent_message = await ctx.respond(embed=embed, ephemeral=False)
@@ -63,7 +47,6 @@ async def send_message(ctx, message=None, embed=None, file=None, edit=False, mes
             if file:
                 sent_message = await ctx.respond(file=file, ephemeral=False)
         else:
-            # For regular command contexts
             sent_message = None
             if embed:
                 sent_message = await ctx.send(embed=embed)
@@ -74,34 +57,19 @@ async def send_message(ctx, message=None, embed=None, file=None, edit=False, mes
         return sent_message
 
 def append_mentions_to_18digit_integer(message):
-    """
-    Removes 18-digit integers from the message (commonly used for Discord user IDs).
-    """
     pattern = r'\b\d{18}\b'
-    return re.sub(pattern, lambda match: f"", message)
+    return re.sub(pattern, lambda match: "", message)
 
 def preprocess_message(message):
-    """
-    Preprocesses the message by removing 18-digit integers and non-alphanumeric tokens.
-    Returns the cleaned message as a string.
-    """
     message = append_mentions_to_18digit_integer(message)
-    tokens = word_tokenize(message)
-    tokens = [token for token in tokens if token.isalnum()]
+    doc = nlp(message)
+    tokens = [token.text for token in doc if token.is_alpha or token.is_digit]
     return " ".join(tokens)
 
 def improve_sentence_coherence(sentence):
-    """
-    Improves sentence coherence by capitalizing isolated 'i' pronouns.
-    """
-    sentence = sentence.replace(" i ", " I ")  
-    return sentence
+    return re.sub(r'\bi\b', 'I', sentence)
 
 def rephrase_for_coherence(sentence):
-    """
-    Rephrases the sentence for coherence by joining words with spaces.
-    (Currently a placeholder function.)
-    """
     words = sentence.split()
     coherent_sentence = " ".join(words)
     return coherent_sentence
