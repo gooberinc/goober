@@ -1,4 +1,6 @@
 {
+    "error fetching_active_users": "Errore nel recupero degli utenti attivi:",
+    "error_sending_alive_ping": "Errore nell'invio di aliveping:",
     "already_started": "Sono già avviato! Non aggiorno...",
     "please_restart": "Riavvia goober!",
     "local_ahead": "Il ramo locale {remote}/{branch} è aggiornato o avanti. Nessun aggiornamento...",

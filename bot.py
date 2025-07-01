@@ -8,6 +8,7 @@ import subprocess
 import tempfile
 import shutil
 import uuid
+import asyncio
 
 from modules.globalvars import *
 from modules.prestartchecks import start_checks
@@ -74,6 +75,25 @@ if not markov_model:
 generated_sentences = set()
 used_words = set()
 
+async def fetch_active_users():
+    try:
+        response = requests.get(f"{VERSION_URL}/active-users")
+        if response.status_code == 200:
+            return response.text.strip()
+        else:
+            return "?"
+    except Exception as e:
+        print(f"{RED}{get_translation(LOCALE, 'error_fetching_active_users')}{RESET} {e}")
+        return "?"
+
+async def send_alive_ping_periodically():
+    while True:
+        try:
+            requests.post(f"{VERSION_URL}/aliveping", json={"name": NAME})
+        except Exception as e:
+            print(f"{RED}{get_translation(LOCALE, 'error_sending_alive_ping')}{RESET} {e}")
+        await asyncio.sleep(60)
+
 # Event: Called when the bot is ready
 @bot.event
 async def on_ready():
@@ -83,15 +103,18 @@ async def on_ready():
     folder_name = "cogs"
     if launched == True:
         return
-    #  create folder logic only existed to prevent errors from upgrading from older versions of goober, now got nuked because its been like a billion versions since then
     await load_cogs_from_folder(bot)
     try:
         synced = await bot.tree.sync()
         print(f"{GREEN}{get_translation(LOCALE, 'synced_commands')} {len(synced)} {get_translation(LOCALE, 'synced_commands2')} {RESET}")
         slash_commands_enabled = True
         ping_server()  # ping_server from modules/central.py
+        # --- Mostra utenti attivi ---
+        active_users = await fetch_active_users()
+        print(f"{GREEN}Utenti attivi: {active_users}{RESET}")
         print(f"{GREEN}{get_translation(LOCALE, 'started').format(name=NAME)}{RESET}")
-
+        # --- Avvia il task periodico ---
+        bot.loop.create_task(send_alive_ping_periodically())
     except discord.errors.Forbidden as perm_error:
         print(f"{RED}Permission error while syncing commands: {perm_error}{RESET}")
         print(f"{RED}Make sure the bot has the 'applications.commands' scope and is invited with the correct permissions.{RESET}")

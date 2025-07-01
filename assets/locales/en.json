@@ -1,4 +1,6 @@
 {
+    "error_fetching_active_users": "Error fetching active users: {error}",
+    "error_sending_alive_ping": "Error sending alive ping: {error}",
     "already_started": "I've already started! I'm not updating...",
     "please_restart": "Please Restart goober!",
     "local_ahead": "Local {remote}/{branch} is ahead and/or up to par. Not Updating...",
