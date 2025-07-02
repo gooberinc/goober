@@ -13,12 +13,12 @@ def check_resources():
     try:
         nlp = spacy.load("en_core_web_sm")
     except OSError:
-        print("spaCy model not found. Downloading en_core_web_sm...")
+        print(get_translation(LOCALE, 'spacy_model_not_found'))
         spacy.cli.download("en_core_web_sm")
         nlp = spacy.load("en_core_web_sm")
     if "spacytextblob" not in nlp.pipe_names:
         nlp.add_pipe("spacytextblob")
-    print("spaCy model and spacytextblob are ready.")
+    print(get_translation(LOCALE, 'spacy_initialized'))
 
 check_resources()
 

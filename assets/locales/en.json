@@ -1,4 +1,7 @@
 {
+    "active_users:": "Active users:",
+    "spacy_initialized": "spaCy and spacytextblob are ready.",
+    "spacy_model_not_found": "The spaCy model was not found! Downloading it....`",
     "env_file_not_found": "The .env file was not found! Please create one with the required variables.",
     "error_fetching_active_users": "Error fetching active users: {error}",
     "error_sending_alive_ping": "Error sending alive ping: {error}",
