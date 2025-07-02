@@ -109,11 +109,11 @@ async def on_ready():
         print(f"{GREEN}{get_translation(LOCALE, 'synced_commands')} {len(synced)} {get_translation(LOCALE, 'synced_commands2')} {RESET}")
         slash_commands_enabled = True
         ping_server()  # ping_server from modules/central.py
-        # --- Mostra utenti attivi ---
+        # I FORGOT TO REMOVE THE ITALIAN VERSION FUCKKKKKKKKK
         active_users = await fetch_active_users()
-        print(f"{GREEN}Utenti attivi: {active_users}{RESET}")
+        print(f"{GREEN}{get_translation(LOCALE, 'active_users:')} {active_users}{RESET}")
         print(f"{GREEN}{get_translation(LOCALE, 'started').format(name=NAME)}{RESET}")
-        # --- Avvia il task periodico ---
+
         bot.loop.create_task(send_alive_ping_periodically())
     except discord.errors.Forbidden as perm_error:
         print(f"{RED}Permission error while syncing commands: {perm_error}{RESET}")

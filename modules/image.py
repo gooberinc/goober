@@ -3,7 +3,7 @@ import re
 from PIL import Image, ImageDraw, ImageFont
 from modules.markovmemory import load_markov_model
 from modules.sentenceprocessing import improve_sentence_coherence, rephrase_for_coherence
-
+# add comments l8r
 generated_sentences = set()
 
 async def gen_image(input_image_path, sentence_size=5, max_attempts=10):
