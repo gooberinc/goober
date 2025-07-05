@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 import json
 import asyncio
 from urllib.parse import urljoin
-from config import ownerid 
+from modules.globalvars import ownerid 
 class WebScraper(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
