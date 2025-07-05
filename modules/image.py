@@ -1,37 +1,46 @@
 import os
 import re
-from PIL import Image, ImageDraw, ImageFont
+import random
+import shutil
+import tempfile
+from typing import Optional, List
+from PIL import Image, ImageDraw, ImageFont, ImageOps
 from modules.markovmemory import load_markov_model
 from modules.sentenceprocessing import improve_sentence_coherence, rephrase_for_coherence
-# add comments l8r
+
 generated_sentences = set()
 
-async def gen_image(input_image_path, sentence_size=5, max_attempts=10):
+def load_font(size):
+    return ImageFont.truetype("assets/fonts/Impact.ttf", size=size)
+
+def load_tnr(size):
+    return ImageFont.truetype("assets/fonts/TNR.ttf", size=size)
+
+def draw_text_with_outline(draw, text, x, y, font):
+    outline_offsets = [(-2, -2), (-2, 2), (2, -2), (2, 2), (0, -2), (0, 2), (-2, 0), (2, 0)]
+    for ox, oy in outline_offsets:
+        draw.text((x + ox, y + oy), text, font=font, fill="black")
+    draw.text((x, y), text, font=font, fill="white")
+
+def fits_in_width(text, font, max_width, draw):
+    bbox = draw.textbbox((0, 0), text, font=font)
+    text_width = bbox[2] - bbox[0]
+    return text_width <= max_width
+
+def split_text_to_fit(text, font, max_width, draw):
+    words = text.split()
+    for i in range(len(words), 0, -1):
+        top_text = " ".join(words[:i])
+        bottom_text = " ".join(words[i:])
+        if fits_in_width(top_text, font, max_width, draw) and fits_in_width(bottom_text, font, max_width, draw):
+            return top_text, bottom_text
+    midpoint = len(words) // 2
+    return " ".join(words[:midpoint]), " ".join(words[midpoint:])
+
+async def gen_meme(input_image_path, sentence_size=5, max_attempts=10):
     markov_model = load_markov_model()
-    if not markov_model:
+    if not markov_model or not os.path.isfile(input_image_path):
         return None
-    if not os.path.isfile(input_image_path):
-        return None
-    def load_font(size):
-        return ImageFont.truetype("assets/fonts/Impact.ttf", size=size)
-    def draw_text_with_outline(draw, text, x, y, font):
-        outline_offsets = [(-2, -2), (-2, 2), (2, -2), (2, 2), (0, -2), (0, 2), (-2, 0), (2, 0)]
-        for ox, oy in outline_offsets:
-            draw.text((x + ox, y + oy), text, font=font, fill="black")
-        draw.text((x, y), text, font=font, fill="white")
-    def fits_in_width(text, font, max_width, draw):
-        bbox = draw.textbbox((0, 0), text, font=font)
-        text_width = bbox[2] - bbox[0]
-        return text_width <= max_width
-    def split_text_to_fit(text, font, max_width, draw):
-        words = text.split()
-        for i in range(len(words), 0, -1):
-            top_text = " ".join(words[:i])
-            bottom_text = " ".join(words[i:])
-            if fits_in_width(top_text, font, max_width, draw) and fits_in_width(bottom_text, font, max_width, draw):
-                return top_text, bottom_text
-        midpoint = len(words) // 2
-        return " ".join(words[:midpoint]), " ".join(words[midpoint:])
 
     attempt = 0
     while attempt < max_attempts:
@@ -59,7 +68,7 @@ async def gen_image(input_image_path, sentence_size=5, max_attempts=10):
                     break
 
             if not response:
-                response = "no text generated"
+                response = "NO TEXT GENERATED"
 
             cleaned_response = re.sub(r'[^\w\s]', '', response).lower()
             coherent_response = rephrase_for_coherence(cleaned_response).upper()
@@ -91,7 +100,6 @@ async def gen_image(input_image_path, sentence_size=5, max_attempts=10):
 
         attempt += 1
 
-
     with Image.open(input_image_path).convert("RGBA") as img:
         draw = ImageDraw.Draw(img)
         width, height = img.size
@@ -104,3 +112,65 @@ async def gen_image(input_image_path, sentence_size=5, max_attempts=10):
         draw_text_with_outline(draw, truncated, (width - text_width) / 2, 0, font)
         img.save(input_image_path)
         return input_image_path
+
+async def gen_demotivator(input_image_path, max_attempts=5):
+    markov_model = load_markov_model()
+    if not markov_model or not os.path.isfile(input_image_path):
+        return None
+
+    attempt = 0
+    while attempt < max_attempts:
+        with Image.open(input_image_path).convert("RGB") as img:
+            size = max(img.width, img.height)
+            square = Image.new("RGB", (size, size), "black")
+            x = (size - img.width) // 2
+            y = (size - img.height) // 2
+            square.paste(img, (x, y))
+            frame_thick = int(size * 0.0054)
+            framed = ImageOps.expand(square, border=frame_thick, fill="white")
+
+            landscape_w = int(size * 1.5)
+            caption_h = int(size * 0.3)
+            canvas_h = framed.height + caption_h
+            canvas = Image.new("RGB", (landscape_w, canvas_h), "black")
+
+            fx = (landscape_w - framed.width) // 2
+            canvas.paste(framed, (fx, 0))
+
+            draw = ImageDraw.Draw(canvas)
+
+            title = subtitle = None
+            for _ in range(20):
+                t = markov_model.make_sentence(tries=100, max_words=4)
+                s = markov_model.make_sentence(tries=100, max_words=5)
+                if t and s and t != s:
+                    title = t.upper()
+                    subtitle = s.capitalize()
+                    break
+            if not title: title = "DEMOTIVATOR"
+            if not subtitle: subtitle = "no text generated"
+
+            title_sz = int(caption_h * 0.4)
+            sub_sz = int(caption_h * 0.25)
+            title_font = load_tnr(title_sz)
+            sub_font = load_tnr(sub_sz)
+
+            bbox = draw.textbbox((0, 0), title, font=title_font)
+            txw, txh = bbox[2] - bbox[0], bbox[3] - bbox[1]
+            tx = (landscape_w - txw) // 2
+            ty = framed.height + int(caption_h * 0.1)
+            draw_text_with_outline(draw, title, tx, ty, title_font)
+
+            bbox = draw.textbbox((0, 0), subtitle, font=sub_font)
+            sxw, sxh = bbox[2] - bbox[0], bbox[3] - bbox[1]
+            sx = (landscape_w - sxw) // 2
+            sy = ty + txh + int(caption_h * 0.05)
+            for ox, oy in [(-1, -1), (1, -1), (-1, 1), (1, 1)]:
+                draw.text((sx + ox, sy + oy), subtitle, font=sub_font, fill="black")
+            draw.text((sx, sy), subtitle, font=sub_font, fill="#AAAAAA")
+
+            canvas.save(input_image_path)
+            return input_image_path
+
+        attempt += 1
+    return None
