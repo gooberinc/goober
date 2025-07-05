@@ -1,4 +1,5 @@
 {
+    "unhandled_exception": "An unhandled exception occurred. Please report this issue on GitHub.",
     "active_users:": "Active users:",
     "spacy_initialized": "spaCy and spacytextblob are ready.",
     "spacy_model_not_found": "The spaCy model was not found! Downloading it....`",

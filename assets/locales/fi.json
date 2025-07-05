@@ -1,4 +1,5 @@
 {
+    "unhandled_exception": "Käsittelemätön virhe tapahtui. Ilmoita tästä GitHubissa.",
     "env_file_not_found": ".env-tiedostoa ei löytnyt! Luo tiedosto jossa on tarvittavat muuttujat",
     "already_started": "Olen jo käynnistynyt! Ei päivitetä...",
     "please_restart": "Käynnistä uudelleen, hölmö!",

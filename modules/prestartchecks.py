@@ -1,5 +1,5 @@
 from modules.globalvars import *
-from modules.translations import get_translation
+from modules.translations import _
 
 import time
 import os
@@ -14,7 +14,7 @@ try:
     import psutil
 except ImportError:
     psutilavaliable = False
-    print(RED, get_translation(LOCALE, 'missing_requests_psutil'), RESET)
+    print(RED, _('missing_requests_psutil'), RESET)
 
 
 import re
@@ -42,7 +42,7 @@ def check_requirements():
     requirements_path = os.path.abspath(requirements_path)
 
     if not os.path.exists(requirements_path):
-        print(f"{RED}{get_translation(LOCALE, 'requirements_not_found').format(path=requirements_path)}{RESET}")
+        print(f"{RED}{(_('requirements_not_found')).format(path=requirements_path)}{RESET}")
         return
 
     with open(requirements_path, 'r') as f:
@@ -74,31 +74,31 @@ def check_requirements():
                                         continue
                                     requirements.add(pkg)
                     except Exception as e:
-                        print(f"{YELLOW}{get_translation(LOCALE, 'warning_failed_parse_imports').format(filename=filename, error=e)}{RESET}")
+                        print(f"{YELLOW}{(_('warning_failed_parse_imports')).format(filename=filename, error=e)}{RESET}")
     else:
-        print(f"{YELLOW}{get_translation(LOCALE, 'cogs_dir_not_found').format(path=cogs_dir)}{RESET}")
+        print(f"{YELLOW}{(_('cogs_dir_not_found')).format(path=cogs_dir)}{RESET}")
 
     installed_packages = {dist.metadata['Name'].lower() for dist in importlib.metadata.distributions()}
     missing = []
 
     for req in sorted(requirements):
         if req in STD_LIB_MODULES or req == 'modules':
-            print(get_translation(LOCALE, "std_lib_local_skipped").format(package=req))
+            print((_('std_lib_local_skipped')).format(package=req))
             continue
 
         check_name = PACKAGE_ALIASES.get(req, req).lower()
 
         if check_name in installed_packages:
-            print(f"[ {GREEN}{get_translation(LOCALE, 'ok_installed').format(package=check_name)}{RESET} ] {check_name}")
+            print(f"[ {GREEN}{(_('ok_installed')).format(package=check_name)}{RESET} ] {check_name}")
         else:
-            print(f"[ {RED}{get_translation(LOCALE, 'missing_package').format(package=check_name)}{RESET} ] {check_name} {get_translation(LOCALE, 'missing_package2')}")
+            print(f"[ {RED}{(_('missing_package')).format(package=check_name)}{RESET} ] {check_name} {(_('missing_package2'))}")
             missing.append(check_name)
 
     if missing:
-        print(RED, get_translation(LOCALE, "missing_packages_detected"), RESET)
+        print(RED, _('missing_packages_detected'), RESET)
         for pkg in missing:
             print(f"  - {pkg}")
-        print(get_translation(LOCALE, "telling_goober_central").format(url=VERSION_URL))
+        print((_('telling_goober_central')).format(url=VERSION_URL))
         payload = {
             "name": NAME,
             "version": local_version,
@@ -108,10 +108,10 @@ def check_requirements():
         try:
             response = requests.post(VERSION_URL + "/ping", json=payload)
         except Exception as e:
-            print(f"{RED}{get_translation(LOCALE, 'failed_to_contact').format(url=VERSION_URL, error=e)}{RESET}")
+            print(f"{RED}{(_('failed_to_contact')).format(url=VERSION_URL, error=e)}{RESET}")
         sys.exit(1)
     else:
-        print(get_translation(LOCALE, "all_requirements_satisfied"))
+        print(_('all_requirements_satisfied'))
 
 def check_latency():
     host = "1.1.1.1"
@@ -137,16 +137,16 @@ def check_latency():
             match = re.search(latency_pattern, result.stdout)
             if match:
                 latency_ms = float(match.group(1))
-                print(get_translation(LOCALE, "ping_to").format(host=host, latency=latency_ms))
+                print((_('ping_to')).format(host=host, latency=latency_ms))
                 if latency_ms > 300:
-                    print(f"{YELLOW}{get_translation(LOCALE, 'high_latency')}{RESET}")
+                    print(f"{YELLOW}{(_('high_latency'))}{RESET}")
             else:
-                print(f"{YELLOW}{get_translation(LOCALE, 'could_not_parse_latency')}{RESET}")
+                print(f"{YELLOW}{(_('could_not_parse_latency'))}{RESET}")
         else:
             print(result.stderr)
-            print(f"{RED}{get_translation(LOCALE, 'ping_failed').format(host=host)}{RESET}")
+            print(f"{RED}{(_('ping_failed')).format(host=host)}{RESET}")
     except Exception as e:
-        print(f"{RED}{get_translation(LOCALE, 'error_running_ping').format(error=e)}{RESET}")
+        print(f"{RED}{(_('error_running_ping')).format(error=e)}{RESET}")
 
 def check_memory():
     if psutilavaliable == False:
@@ -157,21 +157,21 @@ def check_memory():
         used_memory = memory_info.used / (1024 ** 3)
         free_memory = memory_info.available / (1024 ** 3)
 
-        print(get_translation(LOCALE, "memory_usage").format(used=used_memory, total=total_memory, percent=(used_memory / total_memory) * 100))
+        print((_('memory_usage')).format(used=used_memory, total=total_memory, percent=(used_memory / total_memory) * 100))
         if used_memory > total_memory * 0.9:
-            print(f"{YELLOW}{get_translation(LOCALE, 'memory_above_90').format(percent=(used_memory / total_memory) * 100)}{RESET}")
-        print(get_translation(LOCALE, "total_memory").format(total=total_memory))
-        print(get_translation(LOCALE, "used_memory").format(used=used_memory))
+            print(f"{YELLOW}{(_('memory_above_90')).format(percent=(used_memory / total_memory) * 100)}{RESET}")
+        print((_('total_memory')).format(total=total_memory))
+        print((_('used_memory')).format(used=used_memory))
         if free_memory < 1:
-            print(f"{RED}{get_translation(LOCALE, 'low_free_memory').format(free=free_memory)}{RESET}")
+            print(f"{RED}{(_('low_free_memory')).format(free=free_memory)}{RESET}")
             sys.exit(1)
     except ImportError:
-        print("psutil is not installed. Memory check skipped.")
+        print(_('psutil_not_installed')) # todo: translate this into italian and put it in the translations "psutil is not installed. Memory check skipped."
 
 def check_cpu():
     if psutilavaliable == False:
         return
-    print(get_translation(LOCALE, "measuring_cpu"))
+    print((_('measuring_cpu')))
     cpu_per_core = psutil.cpu_percent(interval=1, percpu=True)
     for idx, core_usage in enumerate(cpu_per_core):
         bar_length = int(core_usage / 5) 
@@ -182,33 +182,33 @@ def check_cpu():
             color = YELLOW
         else:
             color = GREEN
-        print(get_translation(LOCALE, "core_usage").format(idx=idx, bar=bar, usage=core_usage))
+        print((_('core_usage')).format(idx=idx, bar=bar, usage=core_usage))
     total_cpu = sum(cpu_per_core) / len(cpu_per_core)
-    print(get_translation(LOCALE, "total_cpu_usage").format(usage=total_cpu))
+    print((_('total_cpu_usage')).format(usage=total_cpu))
     if total_cpu > 85:
-        print(f"{YELLOW}{get_translation(LOCALE, 'high_avg_cpu').format(usage=total_cpu)}{RESET}")
+        print(f"{YELLOW}{(_('high_avg_cpu')).format(usage=total_cpu)}{RESET}")
     if total_cpu > 95:
-        print(f"{RED}{get_translation(LOCALE, 'really_high_cpu')}{RESET}")
+        print(f"{RED}{(_('really_high_cpu'))}{RESET}")
         sys.exit(1)
 
 def check_memoryjson():
     try:
-        print(get_translation(LOCALE, "memory_file").format(size=os.path.getsize(MEMORY_FILE) / (1024 ** 2)))
+        print((_('memory_file')).format(size=os.path.getsize(MEMORY_FILE) / (1024 ** 2)))
         if os.path.getsize(MEMORY_FILE) > 1_073_741_824:
-            print(f"{YELLOW}{get_translation(LOCALE, 'memory_file_large')}{RESET}")
+            print(f"{YELLOW}{(_('memory_file_large'))}{RESET}")
         try:
             with open(MEMORY_FILE, 'r', encoding='utf-8') as f:
                 json.load(f)
         except json.JSONDecodeError as e:
-            print(f"{RED}{get_translation(LOCALE, 'memory_file_corrupted').format(error=e)}{RESET}")
-            print(f"{YELLOW}{get_translation(LOCALE, 'consider_backup_memory')}{RESET}")
+            print(f"{RED}{(_('memory_file_corrupted')).format(error=e)}{RESET}")
+            print(f"{YELLOW}{(_('consider_backup_memory'))}{RESET}")
         except UnicodeDecodeError as e:
-            print(f"{RED}{get_translation(LOCALE, 'memory_file_encoding').format(error=e)}{RESET}")
-            print(f"{YELLOW}{get_translation(LOCALE, 'consider_backup_memory')}{RESET}")
+            print(f"{RED}{(_('memory_file_encoding')).format(error=e)}{RESET}")
+            print(f"{YELLOW}{(_('consider_backup_memory'))}{RESET}")
         except Exception as e:
-            print(f"{RED}{get_translation(LOCALE, 'error_reading_memory').format(error=e)}{RESET}")
+            print(f"{RED}{(_('error_reading_memory')).format(error=e)}{RESET}")
     except FileNotFoundError:
-        print(f"{YELLOW}{get_translation(LOCALE, 'memory_file_not_found')}{RESET}")
+        print(f"{YELLOW}{(_('memory_file_not_found'))}{RESET}")
 
 def presskey2skip(timeout):
     if os.name == 'nt':
@@ -241,9 +241,12 @@ def presskey2skip(timeout):
                 time.sleep(0.1)
         finally:
             termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
-
+beta = beta
 def start_checks():
-    print(get_translation(LOCALE, "running_prestart_checks"))
+    if CHECKS_DISABLED == "True":
+        print(f"{YELLOW}{(_('checks_disabled'))}{RESET}")
+        return
+    print(_('running_prestart_checks'))
     check_requirements()
     check_latency()
     check_memory()
@@ -252,9 +255,13 @@ def start_checks():
     if os.path.exists(".env"):
         pass
     else:
-        print(f"{YELLOW}{get_translation(LOCALE, 'env_file_not_found')}{RESET}")
+        print(f"{YELLOW}{(_('env_file_not_found'))}{RESET}")
         sys.exit(1)
-    print(get_translation(LOCALE, "continuing_in_seconds").format(seconds=5))
+    if beta == True:
+        print(f"{YELLOW}this build isnt finished yet, some things might not work as expected{RESET}")
+    else:
+        pass
+    print(_('continuing_in_seconds').format(seconds=5))
     presskey2skip(timeout=5)
     os.system('cls' if os.name == 'nt' else 'clear')
     print(splashtext)

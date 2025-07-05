@@ -3,7 +3,7 @@ import json
 import markovify
 import pickle
 from modules.globalvars import *
-from modules.translations import *
+from modules.translations import _
 
 # Get file size and line count for a given file path
 def get_file_info(file_path):
@@ -64,8 +64,8 @@ def load_markov_model(filename='markov_model.pkl'):
     try:
         with open(filename, 'rb') as f:
             model = pickle.load(f)
-        print(f"{GREEN}{get_translation(LOCALE, 'model_loaded')} {filename}.{RESET}")
+        print(f"{GREEN}{_('model_loaded')} {filename}.{RESET}")
         return model
     except FileNotFoundError:
-        print(f"{RED}{filename} {get_translation(LOCALE, 'not_found')}{RESET}")
+        print(f"{RED}{filename} {_('not_found')}{RESET}")
         return None

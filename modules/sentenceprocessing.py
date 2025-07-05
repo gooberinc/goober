@@ -1,6 +1,6 @@
 import re
 from modules.globalvars import *
-from modules.translations import *
+from modules.translations import _
 
 import spacy
 from spacy.tokens import Doc
@@ -13,12 +13,12 @@ def check_resources():
     try:
         nlp = spacy.load("en_core_web_sm")
     except OSError:
-        print(get_translation(LOCALE, 'spacy_model_not_found'))
+        print((_('spacy_model_not_found')))
         spacy.cli.download("en_core_web_sm")
         nlp = spacy.load("en_core_web_sm")
     if "spacytextblob" not in nlp.pipe_names:
         nlp.add_pipe("spacytextblob")
-    print(get_translation(LOCALE, 'spacy_initialized'))
+    print((_('spacy_initialized')))
 
 check_resources()
 
@@ -26,7 +26,7 @@ def is_positive(sentence):
     doc = nlp(sentence)
     sentiment_score = doc._.polarity  # from spacytextblob
 
-    debug_message = f"{DEBUG}{get_translation(LOCALE, 'sentence_positivity')} {sentiment_score}{RESET}"
+    debug_message = f"{DEBUG}{(_('sentence_positivity'))} {sentiment_score}{RESET}"
     print(debug_message)
 
     return sentiment_score > 0.1
@@ -36,7 +36,7 @@ async def send_message(ctx, message=None, embed=None, file=None, edit=False, mes
         try:
             await message_reference.edit(content=message, embed=embed)
         except Exception as e:
-            await ctx.send(f"{RED}{get_translation(LOCALE, 'edit_fail')} {e}{RESET}")
+            await ctx.send(f"{RED}{(_('edit_fail'))} {e}{RESET}")
     else:
         if hasattr(ctx, "respond"):
             sent_message = None
