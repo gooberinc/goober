@@ -91,7 +91,7 @@ def get_translation(lang: str, key: str):
     if key in lang_translations:
         return lang_translations[key]
     fallback = translations.get("en", {}).get(key, key)
-    #print(f"{RED}Missing key: '{key}' in language '{lang}', falling back to: '{fallback}'{RESET}")
+    print(f"{RED}Missing key: '{key}' in language '{lang}', falling back to: '{fallback}'{RESET}") # yeah probably print this
     return fallback
 
 def _(key: str) -> str:
