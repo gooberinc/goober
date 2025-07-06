@@ -122,18 +122,16 @@ async def gen_demotivator(input_image_path, max_attempts=5):
     while attempt < max_attempts:
         with Image.open(input_image_path).convert("RGB") as img:
             size = max(img.width, img.height)
-            square = Image.new("RGB", (size, size), "black")
-            x = (size - img.width) // 2
-            y = (size - img.height) // 2
-            square.paste(img, (x, y))
             frame_thick = int(size * 0.0054)
-            framed = ImageOps.expand(square, border=frame_thick, fill="white")
-
+            inner_size = size - 2 * frame_thick
+            resized_img = img.resize((inner_size, inner_size), Image.LANCZOS) 
+            framed = Image.new("RGB", (size, size), "white")
+            framed.paste(resized_img, (frame_thick, frame_thick))
             landscape_w = int(size * 1.5)
             caption_h = int(size * 0.3)
             canvas_h = framed.height + caption_h
             canvas = Image.new("RGB", (landscape_w, canvas_h), "black")
-
+            # the above logic didnt even work, fml
             fx = (landscape_w - framed.width) // 2
             canvas.paste(framed, (fx, 0))
 
