@@ -74,7 +74,7 @@ def check_for_update():
         print(f"{YELLOW}{_('changelog').format(VERSION_URL=VERSION_URL)}{RESET}")
         auto_update()
     elif local_version > latest_version and beta == True:
-        print(f"{YELLOW}You are running an unstable version of Goober, do not expect it to work properly.\nVersion {local_version}{RESET}")
+        print(f"{YELLOW}You are running an \"unstable\" version of Goober, do not expect it to work properly.\nVersion {local_version}{RESET}")
     elif local_version > latest_version:
         print(f"{YELLOW}{_('modification_warning')}{RESET}")
     elif local_version == latest_version:

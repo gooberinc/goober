@@ -227,7 +227,7 @@ async def talk(ctx: commands.Context, sentence_size: int = 5) -> None:
 
 # Command: Generate an image
 @bot.hybrid_command(description=f"{(_('command_desc_help'))}")
-async def meme(ctx: commands.Context) -> None:
+async def impact(ctx: commands.Context) -> None:
     assets_folder: str = "assets/images"
     temp_input: Optional[str] = None
 
