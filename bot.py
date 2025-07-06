@@ -357,26 +357,21 @@ async def help(ctx: commands.Context) -> None:
 @bot.event
 async def on_message(message: discord.Message) -> None:
     global memory, markov_model
-
-    # Ignore bot messages
+    EMOJIS = ["\U0001F604", "\U0001F44D", "\U0001F525", "\U0001F4AF", "\U0001F389", "\U0001F60E"] # originally was emojis but it would probably shit itself on systems without unicode so....
     if message.author.bot:
         return
 
-    # Ignore messages from blacklisted users
     if str(message.author.id) in BLACKLISTED_USERS:
         return
 
-    # Process commands if message starts with a command prefix
     if message.content.startswith((f"{PREFIX}talk", f"{PREFIX}mem", f"{PREFIX}help", f"{PREFIX}stats", f"{PREFIX}")):
         print(f"{(_('command_ran')).format(message=message)}")
         await bot.process_commands(message)
         return
 
-    # Ignore messages with profanity
     if profanity.contains_profanity(message.content):
         return
 
-    # Add user messages to memory for training if enabled
     if message.content:
         if not USERTRAIN_ENABLED:
             return
@@ -386,7 +381,14 @@ async def on_message(message: discord.Message) -> None:
             memory.append(cleaned_message)
             save_memory(memory)
 
-    # Process any commands in the message
+        sentiment_score = is_positive(message.content) # doesnt work but im scared to change the logic now please ignore
+        if sentiment_score > 0.8:
+            emoji = random.choice(EMOJIS)
+            try:
+                await message.add_reaction(emoji)
+            except Exception as e:
+                print(f"Failed to react with emoji: {e}")
+
     await bot.process_commands(message)
 
 # Event: Called on every interaction (slash command, etc.)

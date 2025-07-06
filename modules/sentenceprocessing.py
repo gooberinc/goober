@@ -29,7 +29,7 @@ def is_positive(sentence):
     debug_message = f"{DEBUG}{(_('sentence_positivity'))} {sentiment_score}{RESET}"
     print(debug_message)
 
-    return sentiment_score > 0.1
+    return sentiment_score > 0.6 # had to raise the bar because it kept saying "death to jews" was fine and it kept reacting to them
 
 async def send_message(ctx, message=None, embed=None, file=None, edit=False, message_reference=None):
     if edit and message_reference:
