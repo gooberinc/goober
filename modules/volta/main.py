@@ -61,7 +61,7 @@ def load_translations():
                     translations[lang_code].update(data)
                     _file_mod_times[(lang_code, file_path)] = file_path.stat().st_mtime
                 except Exception as e:
-                    print(f"{RED}Failed loading {file_path}: {e}{RESET}")
+                    print(f"[VOLTA] {RED}Failed loading {file_path}: {e}{RESET}")
 
 def reload_if_changed():
     while True:
@@ -69,11 +69,11 @@ def reload_if_changed():
             try:
                 current_mtime = file_path.stat().st_mtime
                 if current_mtime != last_mtime:
-                    print(f"{RED}Translation file changed: {file_path}, reloading...{RESET}")
+                    print(f"[VOLTA] {RED}Translation file changed: {file_path}, reloading...{RESET}")
                     load_translations()
                     break
             except FileNotFoundError:
-                print(f"{RED}Translation file removed: {file_path}{RESET}")
+                print(f"[VOLTA] {RED}Translation file removed: {file_path}{RESET}")
                 _file_mod_times.pop((lang_code, file_path), None)
                 if lang_code in translations:
                     translations.pop(lang_code, None)
@@ -83,7 +83,7 @@ def set_language(lang: str):
     if lang in translations:
         LOCALE = lang
     else:
-        print(f"{RED}Language '{lang}' not found, defaulting to 'en'{RESET}")
+        print(f"[VOLTA] {RED}Language '{lang}' not found, defaulting to 'en'{RESET}")
         LOCALE = "en"
 
 def get_translation(lang: str, key: str):
@@ -91,7 +91,7 @@ def get_translation(lang: str, key: str):
     if key in lang_translations:
         return lang_translations[key]
     fallback = translations.get("en", {}).get(key, key)
-    print(f"{RED}Missing key: '{key}' in language '{lang}', falling back to: '{fallback}'{RESET}") # yeah probably print this
+    print(f"[VOLTA] {RED}Missing key: '{key}' in language '{lang}', falling back to: '{fallback}'{RESET}") # yeah probably print this
     return fallback
 
 def _(key: str) -> str:
