@@ -1,3 +1,7 @@
+# If you're seeing this after cloning the Goober repo, note that this is a standalone module for translations.
+# While it's used by Goober Core, it lives in its own repository and should not be modified here.
+# For updates or contributions, visit: https://github.com/gooberinc/volta
+
 import os
 import json
 import pathlib
