@@ -4,6 +4,8 @@ import requests
 import subprocess
 import sys
 
+launched = False
+
 # Run a shell command and return its output
 def run_cmd(cmd):
     result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
@@ -17,6 +19,8 @@ def is_remote_ahead(branch='main', remote='origin'):
 
 # Automatically update the local repository if the remote is ahead
 def auto_update(branch='main', remote='origin'):
+    if launched == True:
+        return
     if launched == True:
         print(_("already_started"))
         return
@@ -48,7 +52,7 @@ def get_latest_version_info():
 def check_for_update():
     if ALIVEPING != "True":
         return  
-    global latest_version, local_version
+    global latest_version, local_version, launched
 
     latest_version_info = get_latest_version_info()
     if not latest_version_info:
@@ -80,4 +84,5 @@ def check_for_update():
     elif local_version == latest_version:
         print(f"{GREEN}{_('latest_version')} {local_version}{RESET}")
         print(f"{_('latest_version2').format(VERSION_URL=VERSION_URL)}\n\n")
+    launched = True
     return latest_version
