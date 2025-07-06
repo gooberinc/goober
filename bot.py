@@ -30,7 +30,7 @@ from better_profanity import profanity
 from discord.ext import commands
 
 from modules.central import ping_server
-from modules.translations import _
+from modules.volta.main import _
 from modules.markovmemory import *
 from modules.version import *
 from modules.sentenceprocessing import *
@@ -368,7 +368,7 @@ async def on_message(message: discord.Message) -> None:
 
     # Process commands if message starts with a command prefix
     if message.content.startswith((f"{PREFIX}talk", f"{PREFIX}mem", f"{PREFIX}help", f"{PREFIX}stats", f"{PREFIX}")):
-        print(f"{(_('failed_generate_image')).format(message=message)}")
+        print(f"{(_('command_ran')).format(message=message)}")
         await bot.process_commands(message)
         return
 

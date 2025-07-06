@@ -3,7 +3,7 @@ import json
 import markovify
 import pickle
 from modules.globalvars import *
-from modules.translations import _
+from modules.volta.main import _
 
 # Get file size and line count for a given file path
 def get_file_info(file_path):

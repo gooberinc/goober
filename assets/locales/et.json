@@ -1,4 +1,9 @@
 {
+    "checks_disabled": "Tarkistukset on poistettu käytöstä!",
+    "active_users:": "Aktiiviset käyttäjät:",
+    "spacy_initialized": "spaCy ja spacytextblob ovat valmiita.",
+    "spacy_model_not_found": "spaCy mallia ei löytynyt! Ladataan se....`",
+    "unhandled_exception": "Käsittelemätön virhe tapahtui. Ilmoita tästä GitHubiin.",
     "env_file_not_found": ".env faili ei leitud! Palun loo see vajalike muutujatega.",
     "error_fetching_active_users": "Aktiivsete kasutajate hankimisel tekkis viga: {error}",
     "error_sending_alive_ping": "Elusoleku ping'i saatmisel tekkis viga: {error}",

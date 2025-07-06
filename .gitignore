@@ -9,3 +9,5 @@ venv/
 output.png
 .vscode/
 received_memory.json
+translation_report.txt
+translationcompleteness.py

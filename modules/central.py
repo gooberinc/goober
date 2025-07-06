@@ -1,7 +1,7 @@
 import requests
 import os
 import modules.globalvars as gv
-from modules.translations import _
+from modules.volta.main import _
 from modules.markovmemory import get_file_info
 
 # Ping the server to check if it's alive and send some info

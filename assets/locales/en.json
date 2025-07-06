@@ -1,4 +1,5 @@
 {
+    "checks_disabled": "Checks are disabled!",
     "unhandled_exception": "An unhandled exception occurred. Please report this issue on GitHub.",
     "active_users:": "Active users:",
     "spacy_initialized": "spaCy and spacytextblob are ready.",

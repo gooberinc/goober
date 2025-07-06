@@ -1,12 +1,16 @@
 from modules.globalvars import *
-from modules.translations import _
+from modules.volta.main import _, get_translation, load_translations, set_language, translations
 
 import time
 import os
 import sys
 import subprocess
+import sysconfig
 import ast
 import json
+import re
+import importlib.metadata
+
 # import shutil
 psutilavaliable = True
 try:
@@ -16,30 +20,56 @@ except ImportError:
     psutilavaliable = False
     print(RED, _('missing_requests_psutil'), RESET)
 
+def check_missing_translations():
+    if LOCALE == "en":
+        print("Locale is English, skipping missing key check.")
+        return
+    load_translations()
 
-import re
-import importlib.metadata
+    en_keys = set(translations.get("en", {}).keys())
+    locale_keys = set(translations.get(LOCALE, {}).keys())
+
+    missing_keys = en_keys - locale_keys
+    total_keys = len(en_keys)
+    missing_count = len(missing_keys)
+
+    if missing_count > 0:
+        percent_missing = (missing_count / total_keys) * 100
+        print(f"{YELLOW}Warning: {missing_count}/{total_keys} keys missing in locale '{LOCALE}' ({percent_missing:.1f}%)!{RESET}")
+        for key in sorted(missing_keys):
+            print(f"  - {key}")
+        time.sleep(5)
+    else:
+        print("All translation keys present for locale:", LOCALE)
 
 
 
+def get_stdlib_modules():
+    stdlib_path = pathlib.Path(sysconfig.get_paths()['stdlib'])
+    modules = set()
+    if hasattr(sys, 'builtin_module_names'):
+        modules.update(sys.builtin_module_names)
+    for file in stdlib_path.glob('*.py'):
+        if file.stem != '__init__':
+            modules.add(file.stem)
+    for folder in stdlib_path.iterdir():
+        if folder.is_dir() and (folder / '__init__.py').exists():
+            modules.add(folder.name)
+    for file in stdlib_path.glob('*.*'):
+        if file.suffix in ('.so', '.pyd'):
+            modules.add(file.stem)
+
+    return modules
 
 def check_requirements():
-    STD_LIB_MODULES = {
-        "os", "sys", "time", "ast", "asyncio", "re", "subprocess", "json",
-        "datetime", "threading", "math", "logging", "functools", "itertools",
-        "collections", "shutil", "socket", "types", "enum", "pathlib",
-        "inspect", "traceback", "platform", "typing", "warnings", "email",
-        "http", "urllib", "argparse", "io", "copy", "pickle", "gzip", "csv",
-    }
+    STD_LIB_MODULES = get_stdlib_modules()
     PACKAGE_ALIASES = {
         "discord": "discord.py",
         "better_profanity": "better-profanity",
-        
     }
 
     parent_dir = os.path.dirname(os.path.abspath(__file__))
-    requirements_path = os.path.join(parent_dir, '..', 'requirements.txt')
-    requirements_path = os.path.abspath(requirements_path)
+    requirements_path = os.path.abspath(os.path.join(parent_dir, '..', 'requirements.txt'))
 
     if not os.path.exists(requirements_path):
         print(f"{RED}{(_('requirements_not_found')).format(path=requirements_path)}{RESET}")
@@ -52,7 +82,7 @@ def check_requirements():
             if line.strip() and not line.startswith('#')
         }
 
-    cogs_dir = os.path.abspath(os.path.join(parent_dir, '..', 'cogs'))
+    cogs_dir = os.path.abspath(os.path.join(parent_dir, '..', 'assets', 'cogs'))
     if os.path.isdir(cogs_dir):
         for filename in os.listdir(cogs_dir):
             if filename.endswith('.py'):
@@ -106,7 +136,7 @@ def check_requirements():
             "token": gooberTOKEN
         }
         try:
-            response = requests.post(VERSION_URL + "/ping", json=payload)
+            requests.post(VERSION_URL + "/ping", json=payload)
         except Exception as e:
             print(f"{RED}{(_('failed_to_contact')).format(url=VERSION_URL, error=e)}{RESET}")
         sys.exit(1)
@@ -247,6 +277,7 @@ def start_checks():
         print(f"{YELLOW}{(_('checks_disabled'))}{RESET}")
         return
     print(_('running_prestart_checks'))
+    check_missing_translations()
     check_requirements()
     check_latency()
     check_memory()

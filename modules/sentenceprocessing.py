@@ -1,6 +1,6 @@
 import re
 from modules.globalvars import *
-from modules.translations import _
+from modules.volta.main import _
 
 import spacy
 from spacy.tokens import Doc

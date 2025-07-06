@@ -1,7 +1,9 @@
 {
+    "checks_disabled": "I controlli sono disabilitati!",
     "unhandled_exception": "Si è verificata un'eccezione non gestita. Segnala questo problema su GitHub, per favore.",
     "active_users:": "Utenti attivi:",
     "spacy_initialized": "spaCy e spacytextblob sono pronti.",
+    "error_fetching_active_users": "Errore nel recupero degli utenti attivi: {error}",
     "spacy_model_not_found": "Il modello spaCy non è stato trovato! Lo sto scaricando...",
     "env_file_not_found": "Il file .env non è stato trovato! Crea un file con le variabili richieste.",
     "error fetching_active_users": "Errore nel recupero degli utenti attivi:",
@@ -108,6 +110,7 @@
     "command_help_categories_admin": "Amministrazione",
     "command_help_categories_custom": "Comandi personalizzati",
     "command_ran": "Info: {message.author.name} ha eseguito {message.content}",
+    "command_ran_s": "Info: {interaction.user} ha eseguito ",
     "command_desc_ping": "ping",
     "command_ping_embed_desc": "Latenza del bot:",
     "command_ping_footer": "Richiesto da",

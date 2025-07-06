@@ -2,7 +2,7 @@ import sys
 import traceback
 import os
 from modules.globalvars import RED, RESET, splashtext
-from modules.translations import _
+from modules.volta.main import _
 
 def handle_exception(exc_type, exc_value, exc_traceback, *, context=None):
     os.system('cls' if os.name == 'nt' else 'clear')

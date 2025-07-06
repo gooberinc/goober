@@ -25,3 +25,4 @@ by expect (requires goober version 0.11.8 or higher)
 
 [LastFM](https://raw.githubusercontent.com/WhatDidYouExpect/goober/refs/heads/main/cogs/webserver.py)
 by expect (no idea what version it needs i've only tried it on 1.0.3)
+- you have to add LASTFM_USERNAME and LASTFM_API_KEY to your .env
