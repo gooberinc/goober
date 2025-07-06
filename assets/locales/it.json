@@ -1,4 +1,5 @@
 {
+    "not_cloned": "Goober non è stato clonato! Clonalo da GitHub.",
     "checks_disabled": "I controlli sono disabilitati!",
     "unhandled_exception": "Si è verificata un'eccezione non gestita. Segnala questo problema su GitHub, per favore.",
     "active_users:": "Utenti attivi:",

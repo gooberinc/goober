@@ -20,6 +20,13 @@ except ImportError:
     psutilavaliable = False
     print(RED, _('missing_requests_psutil'), RESET)
 
+def iscloned():
+    if os.path.exists(".git"):
+        return True
+    else:
+        print(f"{RED}{(_('not_cloned'))}{RESET}")
+        sys.exit(1)
+
 def check_missing_translations():
     if LOCALE == "en":
         print("Locale is English, skipping missing key check.")
@@ -277,6 +284,7 @@ def start_checks():
         print(f"{YELLOW}{(_('checks_disabled'))}{RESET}")
         return
     print(_('running_prestart_checks'))
+    iscloned()
     check_missing_translations()
     check_requirements()
     check_latency()
