@@ -383,6 +383,8 @@ async def on_message(message: discord.Message) -> None:
 
         sentiment_score = is_positive(message.content) # doesnt work but im scared to change the logic now please ignore
         if sentiment_score > 0.8:
+            if REACT != "True":
+                return
             emoji = random.choice(EMOJIS)
             try:
                 await message.add_reaction(emoji)
