@@ -4,7 +4,13 @@ import pathlib
 import threading
 import time
 from dotenv import load_dotenv
-from modules.globalvars import RED, RESET
+
+ANSI = "\033["
+RED = f"{ANSI}31m"
+GREEN = f"{ANSI}32m"
+YELLOW = f"{ANSI}33m"
+DEBUG = f"{ANSI}1;30m"
+RESET = f"{ANSI}0m"
 
 load_dotenv()
 
