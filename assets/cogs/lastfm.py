@@ -78,6 +78,7 @@ class LastFmCog(commands.Cog):
         return None
 
 async def setup(bot):
-    if not LASTFM_API_KEY and LASTFM_USERNAME:
+    if not LASTFM_API_KEY or not LASTFM_USERNAME:
         return
-    await bot.add_cog(LastFmCog(bot))
+    else:
+        await bot.add_cog(LastFmCog(bot))
