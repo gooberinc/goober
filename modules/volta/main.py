@@ -117,7 +117,7 @@ def check_missing_translations():
         ENGLISH_MISSING = True
         return
     if LOCALE == "en":
-        print("Locale is English, skipping missing key check.")
+        print("[VOLTA] Locale is English, skipping missing key check.")
         return
     
 
@@ -134,12 +134,12 @@ def check_missing_translations():
             print(f"[VOLTA] {YELLOW}Warning: All keys are missing in locale '{LOCALE}'! Defaulting back to {FALLBACK_LOCALE}{RESET}")
             set_language(FALLBACK_LOCALE)
         elif percent_missing > 0:
-            print(f"{YELLOW}Warning: {missing_count}/{total_keys} keys missing in locale '{LOCALE}' ({percent_missing:.1f}%)!{RESET}")
+            print(f"[VOLTA] {YELLOW}Warning: {missing_count}/{total_keys} keys missing in locale '{LOCALE}' ({percent_missing:.1f}%)!{RESET}")
             for key in sorted(missing_keys):
                 print(f"  - {key}")
             time.sleep(2)
     else:
-        print("All translation keys present for locale:", LOCALE)
+        print(f"[VOLTA] All translation keys present for locale: {LOCALE}")
 
 
 def get_translation(lang: str, key: str):
