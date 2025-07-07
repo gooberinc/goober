@@ -26,16 +26,6 @@ def load_memory():
     except FileNotFoundError:
         pass
 
-    # If MEMORY_LOADED_FILE does not exist, load default data and mark as loaded
-    if not os.path.exists(MEMORY_LOADED_FILE):
-        try:
-            with open(DEFAULT_DATASET_FILE, "r") as f:
-                default_data = json.load(f)
-                data.extend(default_data) 
-        except FileNotFoundError:
-            pass
-        with open(MEMORY_LOADED_FILE, "w") as f:
-            f.write("Data loaded") 
     return data
 
 # Save memory data to MEMORY_FILE

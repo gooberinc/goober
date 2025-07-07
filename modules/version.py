@@ -20,8 +20,6 @@ def is_remote_ahead(branch='main', remote='origin'):
 # Automatically update the local repository if the remote is ahead
 def auto_update(branch='main', remote='origin'):
     if launched == True:
-        return
-    if launched == True:
         print(_("already_started"))
         return
     if AUTOUPDATE != "True":
@@ -77,7 +75,7 @@ def check_for_update():
         print(f"{YELLOW}{_('new_version').format(latest_version=latest_version, local_version=local_version)}{RESET}")
         print(f"{YELLOW}{_('changelog').format(VERSION_URL=VERSION_URL)}{RESET}")
         auto_update()
-    elif local_version > latest_version and beta == True:
+    elif beta == True:
         print(f"{YELLOW}You are running an \"unstable\" version of Goober, do not expect it to work properly.\nVersion {local_version}{RESET}")
     elif local_version > latest_version:
         print(f"{YELLOW}{_('modification_warning')}{RESET}")

@@ -23,6 +23,7 @@ import requests
 
 import discord
 from discord.ext import commands
+from discord import app_commands
 from discord import Colour, Embed, File, Interaction, Message
 from discord.abc import Messageable
 
@@ -30,7 +31,7 @@ from better_profanity import profanity
 from discord.ext import commands
 
 from modules.central import ping_server
-from modules.volta.main import _
+from modules.volta.main import _, set_language
 from modules.markovmemory import *
 from modules.version import *
 from modules.sentenceprocessing import *
@@ -334,8 +335,8 @@ async def help(ctx: commands.Context) -> None:
     )
 
     command_categories: Dict[str, List[str]] = {
-        f"{(_('command_help_categories_general'))}": ["mem", "talk", "about", "ping", "image"],
-        f"{(_('command_help_categories_admin'))}": ["stats", "retrain"]
+        f"{(_('command_help_categories_general'))}": ["mem", "talk", "about", "ping", "impact", "demotivator", "help"],
+        f"{(_('command_help_categories_admin'))}": ["stats", "retrain", "setlanguage"]
     }
 
     custom_commands: List[str] = []
@@ -352,6 +353,16 @@ async def help(ctx: commands.Context) -> None:
         embed.add_field(name=category, value=commands_in_category, inline=False)
 
     await send_message(ctx, embed=embed)
+
+@bot.hybrid_command(description=f"{(_('command_desc_setlang'))}")
+@app_commands.describe(locale="Choose your language")
+async def setlanguage(ctx: commands.Context, locale: str) -> None:
+    if ctx.author.id != ownerid:
+        await ctx.send(":thumbsdown:")
+        return
+    await ctx.defer()
+    set_language(locale)
+    await ctx.send(":thumbsup:")
 
 # Event: Called on every message
 @bot.event

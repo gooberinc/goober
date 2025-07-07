@@ -112,6 +112,7 @@
     "command_ran": "Info: {message.author.name} ran {message.content}",
     "command_ran_s": "Info: {interaction.user} ran ",
     "command_desc_ping": "ping",
+    "command_desc_setlang": "Set a new language for the bot (temporarily)",
     "command_ping_embed_desc": "Bot Latency:",
     "command_ping_footer": "Requested by",
     "command_about_desc": "about",

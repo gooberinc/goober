@@ -5,9 +5,7 @@ from modules.volta.main import _
 import spacy
 from spacy.tokens import Doc
 from spacytextblob.spacytextblob import SpacyTextBlob
-nlp = spacy.load("en_core_web_sm")
-nlp.add_pipe("spacytextblob")
-Doc.set_extension("polarity", getter=lambda doc: doc._.blob.polarity)
+
 
 def check_resources():
     try:
@@ -21,6 +19,10 @@ def check_resources():
     print((_('spacy_initialized')))
 
 check_resources()
+
+nlp = spacy.load("en_core_web_sm")
+nlp.add_pipe("spacytextblob")
+Doc.set_extension("polarity", getter=lambda doc: doc._.blob.polarity)
 
 def is_positive(sentence):
     doc = nlp(sentence)

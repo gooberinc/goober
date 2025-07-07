@@ -24,7 +24,10 @@ working_dir = pathlib.Path.cwd()
 EXCLUDE_DIRS = {'.git', '__pycache__'}
 
 locales_dirs = []
-
+ENGLISH_MISSING = False
+FALLBACK_LOCALE = "en"
+if os.getenv("fallback_locale"):
+    FALLBACK_LOCALE = os.getenv("fallback_locale")
 def find_locales_dirs(base_path):
     found = []
     for root, dirs, files in os.walk(base_path):
@@ -35,6 +38,22 @@ def find_locales_dirs(base_path):
             found.append(locales_path)
             dirs.remove('locales')
     return found
+
+def find_dotenv(start_path: pathlib.Path) -> pathlib.Path | None:
+    current = start_path.resolve()
+    while current != current.parent:
+        candidate = current / ".env"
+        if candidate.exists():
+            return candidate
+        current = current.parent
+    return None
+
+env_path = find_dotenv(pathlib.Path(__file__).parent)
+if env_path:
+    load_dotenv(dotenv_path=env_path)
+    print(f"[VOLTA] {GREEN}Loaded .env from {env_path}{RESET}")
+else:
+    print(f"[VOLTA] {YELLOW}No .env file found from {__file__} upwards.{RESET}")
 
 locales_dirs.extend(find_locales_dirs(module_dir))
 if working_dir != module_dir:
@@ -79,19 +98,61 @@ def reload_if_changed():
                     translations.pop(lang_code, None)
 
 def set_language(lang: str):
-    global LOCALE
+    global LOCALE, ENGLISH_MISSING
     if lang in translations:
         LOCALE = lang
     else:
         print(f"[VOLTA] {RED}Language '{lang}' not found, defaulting to 'en'{RESET}")
-        LOCALE = "en"
+        if FALLBACK_LOCALE in translations:
+            LOCALE = FALLBACK_LOCALE
+        else:
+            print(f"[VOLTA] {RED}The fallback translations cannot be found! No fallback available.{RESET}")
+            ENGLISH_MISSING = True
+
+def check_missing_translations():
+    global LOCALE, ENGLISH_MISSING
+    load_translations()
+    if FALLBACK_LOCALE not in translations:
+        print(f"[VOLTA] {RED}Fallback translations ({FALLBACK_LOCALE}.json) missing from assets/locales.{RESET}")
+        ENGLISH_MISSING = True
+        return
+    if LOCALE == "en":
+        print("Locale is English, skipping missing key check.")
+        return
+    
+
+    en_keys = set(translations.get("en", {}).keys())
+    locale_keys = set(translations.get(LOCALE, {}).keys())
+
+    missing_keys = en_keys - locale_keys
+    total_keys = len(en_keys)
+    missing_count = len(missing_keys)
+
+    if missing_count > 0:
+        percent_missing = (missing_count / total_keys) * 100
+        if percent_missing == 100:
+            print(f"[VOLTA] {YELLOW}Warning: All keys are missing in locale '{LOCALE}'! Defaulting back to {FALLBACK_LOCALE}{RESET}")
+            set_language(FALLBACK_LOCALE)
+        elif percent_missing > 0:
+            print(f"{YELLOW}Warning: {missing_count}/{total_keys} keys missing in locale '{LOCALE}' ({percent_missing:.1f}%)!{RESET}")
+            for key in sorted(missing_keys):
+                print(f"  - {key}")
+            time.sleep(2)
+    else:
+        print("All translation keys present for locale:", LOCALE)
+
 
 def get_translation(lang: str, key: str):
+    if ENGLISH_MISSING:
+        return f"[VOLTA] {RED}No fallback available!{RESET}"
     lang_translations = translations.get(lang, {})
     if key in lang_translations:
         return lang_translations[key]
-    fallback = translations.get("en", {}).get(key, key)
-    print(f"[VOLTA] {RED}Missing key: '{key}' in language '{lang}', falling back to: '{fallback}'{RESET}") # yeah probably print this
+    else:
+        if key not in translations.get(FALLBACK_LOCALE, {}):
+            return f"[VOLTA] {YELLOW}Missing key: '{key}' in {FALLBACK_LOCALE}.json!{RESET}"
+    fallback = translations.get(FALLBACK_LOCALE, {}).get(key, key)
+    print(f"[VOLTA] {YELLOW}Missing key: '{key}' in language '{lang}', falling back to: '{fallback}' using {FALLBACK_LOCALE}.json{RESET}") # yeah probably print this
     return fallback
 
 def _(key: str) -> str:
@@ -101,3 +162,6 @@ load_translations()
 
 watchdog_thread = threading.Thread(target=reload_if_changed, daemon=True)
 watchdog_thread.start()
+
+if __name__ == '__main__':
+    print("Volta should not be run directly! Please use it as a module..")
