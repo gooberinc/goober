@@ -20,6 +20,7 @@ print(splashtext)  # Print splash text (from modules/globalvars.py)
 start_checks()
 
 import requests
+import asqlite
 
 import discord
 from discord.ext import commands

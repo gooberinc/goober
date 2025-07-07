@@ -130,6 +130,6 @@
     "command_stats_embed_field2name": "Versione",
     "command_stats_embed_field2value": "Locale: {local_version} \nUltima: {latest_version}",
     "command_stats_embed_field3name": "Informazioni sulle variabili",
-    "command_stats_embed_field3value": "Nome: {NAME} \nPrefisso: {PREFIX} \nID Proprietario: {ownerid} \nCooldown: {cooldown_time} \nLinea ping: {PING_LINE} \nMemoria Condivisa Abilitata: {showmemenabled} \nAddestramento Utente Abilitato: {USERTRAIN_ENABLED}\nCanzone: {song} \nSplashtext: ```{splashtext}```"
+    "command_stats_embed_field3value": "Nome: {NAME} \nPrefisso: {PREFIX} \nID Proprietario: {ownerid}\nLinea ping: {PING_LINE} \nMemoria Condivisa Abilitata: {showmemenabled} \nAddestramento Utente Abilitato: {USERTRAIN_ENABLED}\nCanzone: {song} \nSplashtext: ```{splashtext}```"
   }
   
