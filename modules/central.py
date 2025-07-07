@@ -70,7 +70,7 @@ def register_name(NAME):
             if os.getenv("gooberTOKEN"):
                 return
             # Name taken: print error and exit
-            print(f"{RED}{(_('name_taken'))}{gv.RESET}")
+            print(f"{gv.RED}{(_('name_taken'))}{gv.RESET}")
             quit()
         # Register the name
         response = requests.post(f"{gv.VERSION_URL}/register", json={"name": NAME}, headers={"Content-Type": "application/json"})

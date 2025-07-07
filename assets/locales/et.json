@@ -126,6 +126,6 @@
     "command_stats_embed_field2name": "Versioon",
     "command_stats_embed_field2value": "Kohalik: {local_version} \nViimane: {latest_version}",
     "command_stats_embed_field3name": "Muutuja info",
-    "command_stats_embed_field3value": "Nimi: {NAME} \nPrefiks: {PREFIX} \nOmaniku ID: {ownerid} \nJahtumisaeg: {cooldown_time} \nPingirida: {PING_LINE} \nMälu jagamine lubatud: {showmemenabled} \nKasutajaõpe lubatud: {USERTRAIN_ENABLED}\nLaul: {song} \nSplashtekst: ```{splashtext}```"
+    "command_stats_embed_field3value": "Nimi: {NAME} \nPrefiks: {PREFIX} \nOmaniku ID: {ownerid}\nPingirida: {PING_LINE} \nMälu jagamine lubatud: {showmemenabled} \nKasutajaõpe lubatud: {USERTRAIN_ENABLED}\nLaul: {song} \nSplashtekst: ```{splashtext}```"
 }
 

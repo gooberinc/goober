@@ -127,7 +127,7 @@ def check_requirements():
             "token": gooberTOKEN
         }
         try:
-            requests.post(VERSION_URL + "/ping", json=payload)
+            requests.post(VERSION_URL + "/ping", json=payload)  # type: ignore
         except Exception as e:
             print(f"{RED}{(_('failed_to_contact')).format(url=VERSION_URL, error=e)}{RESET}")
         sys.exit(1)
@@ -173,7 +173,7 @@ def check_memory():
     if psutilavaliable == False:
         return
     try:
-        memory_info = psutil.virtual_memory()
+        memory_info = psutil.virtual_memory()  # type: ignore
         total_memory = memory_info.total / (1024 ** 3)
         used_memory = memory_info.used / (1024 ** 3)
         free_memory = memory_info.available / (1024 ** 3)
@@ -193,7 +193,7 @@ def check_cpu():
     if psutilavaliable == False:
         return
     print((_('measuring_cpu')))
-    cpu_per_core = psutil.cpu_percent(interval=1, percpu=True)
+    cpu_per_core = psutil.cpu_percent(interval=1, percpu=True)  # type: ignore
     for idx, core_usage in enumerate(cpu_per_core):
         bar_length = int(core_usage / 5) 
         bar = '█' * bar_length + '-' * (20 - bar_length)

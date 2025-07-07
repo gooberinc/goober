@@ -20,6 +20,7 @@ print(splashtext)  # Print splash text (from modules/globalvars.py)
 start_checks()
 
 import requests
+import asqlite
 
 import discord
 from discord.ext import commands
@@ -61,6 +62,9 @@ bot: commands.Bot = commands.Bot(
     intents=intents,
     allowed_mentions=discord.AllowedMentions(everyone=False, roles=False, users=False, replied_user=True)
 )
+
+# Initialize database pool for fireboard functionality
+bot.fireboard_pool = None
 
 # Load memory and Markov model for text generation
 memory: List[str] = load_memory()
@@ -114,6 +118,14 @@ async def on_ready() -> None:
     folder_name: str = "cogs"
     if launched:
         return
+    
+    # Initialize database pool for fireboard functionality
+    try:
+        bot.fireboard_pool = await asqlite.create_pool("fireboard.db")
+        print(f"{GREEN}Database pool initialized successfully{RESET}")
+    except Exception as e:
+        print(f"{RED}Failed to initialize database pool: {e}{RESET}")
+        bot.fireboard_pool = None
         
     await load_cogs_from_folder(bot)
     try:
@@ -473,7 +485,7 @@ async def stats(ctx: commands.Context) -> None:
     embed: discord.Embed = discord.Embed(title=f"{(_('command_stats_embed_title'))}", description=f"{(_('command_stats_embed_desc'))}", color=Colour(0x000000))
     embed.add_field(name=f"{(_('command_stats_embed_field1name'))}", value=f"{(_('command_stats_embed_field1value')).format(file_size=file_size, line_count=line_count)}", inline=False)
     embed.add_field(name=f"{(_('command_stats_embed_field2name'))}", value=f"{(_('command_stats_embed_field2value')).format(local_version=local_version, latest_version=latest_version)}", inline=False)
-    embed.add_field(name=f"{(_('command_stats_embed_field3name'))}", value=f"{(_('command_stats_embed_field3value')).format(NAME=NAME, PREFIX=PREFIX, ownerid=ownerid, cooldown_time=cooldown_time, PING_LINE=PING_LINE, showmemenabled=showmemenabled, USERTRAIN_ENABLED=USERTRAIN_ENABLED, song=song, splashtext=splashtext)}", inline=False)
+    embed.add_field(name=f"{(_('command_stats_embed_field3name'))}", value=f"{(_('command_stats_embed_field3value')).format(NAME=NAME, PREFIX=PREFIX, ownerid=ownerid, PING_LINE=PING_LINE, showmemenabled=showmemenabled, USERTRAIN_ENABLED=USERTRAIN_ENABLED, song=song, splashtext=splashtext)}", inline=False)
 
     await send_message(ctx, embed=embed)
 

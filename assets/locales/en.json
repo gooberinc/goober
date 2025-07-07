@@ -128,6 +128,6 @@
     "command_stats_embed_field2name": "Version",
     "command_stats_embed_field2value": "Local: {local_version} \nLatest: {latest_version}",
     "command_stats_embed_field3name": "Variable Info",
-    "command_stats_embed_field3value": "Name: {NAME} \nPrefix: {PREFIX} \nOwner ID: {ownerid} \nCooldown: {cooldown_time} \nPing line: {PING_LINE} \nMemory Sharing Enabled: {showmemenabled} \nUser Training Enabled: {USERTRAIN_ENABLED}\nSong: {song} \nSplashtext: ```{splashtext}```"
+    "command_stats_embed_field3value": "Name: {NAME} \nPrefix: {PREFIX} \nOwner ID: {ownerid}\nPing line: {PING_LINE} \nMemory Sharing Enabled: {showmemenabled} \nUser Training Enabled: {USERTRAIN_ENABLED}\nSong: {song} \nSplashtext: ```{splashtext}```"
 }
   

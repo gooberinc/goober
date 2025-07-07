@@ -12,3 +12,6 @@ received_memory.json
 translation_report.txt
 translationcompleteness.py
 modules/volta
+fireboard.db
+fireboard.db-shm
+fireboard.db-wal
