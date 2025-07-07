@@ -113,6 +113,7 @@
     "command_ran": "Info: {message.author.name} ha eseguito {message.content}",
     "command_ran_s": "Info: {interaction.user} ha eseguito ",
     "command_desc_ping": "ping",
+    "command_desc_setlang": "Imposta una nuova lingua per il bot (temporaneamente)",
     "command_ping_embed_desc": "Latenza del bot:",
     "command_ping_footer": "Richiesto da",
     "command_about_desc": "informazioni",
