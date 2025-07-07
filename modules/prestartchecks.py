@@ -8,6 +8,7 @@ import sysconfig
 import ast
 import json
 import re
+from spacy.util import is_package
 import importlib.metadata
 
 # import shutil
@@ -19,6 +20,13 @@ except ImportError:
     psutilavaliable = False
     print(RED, _('missing_requests_psutil'), RESET)
 
+def check_for_model():
+    if is_package("en_core_web_sm"):
+        print("Model is installed.")
+    else:
+        print("Model is not installed.")
+
+    
 def iscloned():
     if os.path.exists(".git"):
         return True
@@ -260,6 +268,7 @@ def start_checks():
         print(f"{YELLOW}{(_('checks_disabled'))}{RESET}")
         return
     print(_('running_prestart_checks'))
+    check_for_model()
     iscloned()
     check_missing_translations()
     check_requirements()
