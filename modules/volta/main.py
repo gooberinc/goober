@@ -25,7 +25,9 @@ EXCLUDE_DIRS = {'.git', '__pycache__'}
 
 locales_dirs = []
 ENGLISH_MISSING = False
-
+FALLBACK_LOCALE = "en"
+if os.getenv("fallback_locale"):
+    FALLBACK_LOCALE = os.getenv("fallback_locale")
 def find_locales_dirs(base_path):
     found = []
     for root, dirs, files in os.walk(base_path):
@@ -85,17 +87,17 @@ def set_language(lang: str):
         LOCALE = lang
     else:
         print(f"[VOLTA] {RED}Language '{lang}' not found, defaulting to 'en'{RESET}")
-        if "en" in translations:
-            LOCALE = "en"
+        if FALLBACK_LOCALE in translations:
+            LOCALE = FALLBACK_LOCALE
         else:
-            print(f"[VOLTA] {RED}The English translations cannot be found! No fallback available.{RESET}")
+            print(f"[VOLTA] {RED}The fallback translations cannot be found! No fallback available.{RESET}")
             ENGLISH_MISSING = True
 
 def check_missing_translations():
     global LOCALE, ENGLISH_MISSING
     load_translations()
-    if "en" not in translations:
-        print(f"[VOLTA] {RED}English translations (en.json) missing from assets/locales. Exiting.{RESET}")
+    if FALLBACK_LOCALE not in translations:
+        print(f"[VOLTA] {RED}Fallback translations ({FALLBACK_LOCALE}.json) missing from assets/locales. Exiting.{RESET}")
         ENGLISH_MISSING = True
         return
     if LOCALE == "en":
@@ -113,8 +115,8 @@ def check_missing_translations():
     if missing_count > 0:
         percent_missing = (missing_count / total_keys) * 100
         if percent_missing == 100:
-            print(f"[VOLTA] {RED}Warning: All keys are missing in locale '{LOCALE}'! Defaulting back to en{RESET}")
-            set_language("en")
+            print(f"[VOLTA] {RED}Warning: All keys are missing in locale '{LOCALE}'! Defaulting back to {FALLBACK_LOCALE}{RESET}")
+            set_language(FALLBACK_LOCALE)
         elif percent_missing > 0:
             print(f"{YELLOW}Warning: {missing_count}/{total_keys} keys missing in locale '{LOCALE}' ({percent_missing:.1f}%)!{RESET}")
             for key in sorted(missing_keys):
@@ -131,10 +133,10 @@ def get_translation(lang: str, key: str):
     if key in lang_translations:
         return lang_translations[key]
     else:
-        if key not in translations.get("en", {}):
-            return f"[VOLTA] {RED}Missing key: '{key}' in en.json!{RESET}"
-    fallback = translations.get("en", {}).get(key, key)
-    print(f"[VOLTA] {RED}Missing key: '{key}' in language '{lang}', falling back to: '{fallback}'{RESET}") # yeah probably print this
+        if key not in translations.get(FALLBACK_LOCALE, {}):
+            return f"[VOLTA] {RED}Missing key: '{key}' in {FALLBACK_LOCALE}.json!{RESET}"
+    fallback = translations.get(FALLBACK_LOCALE, {}).get(key, key)
+    print(f"[VOLTA] {RED}Missing key: '{key}' in language '{lang}', falling back to: '{fallback}' using {FALLBACK_LOCALE}.json{RESET}") # yeah probably print this
     return fallback
 
 def _(key: str) -> str:
@@ -145,3 +147,5 @@ load_translations()
 watchdog_thread = threading.Thread(target=reload_if_changed, daemon=True)
 watchdog_thread.start()
 
+if __name__ == '__main__':
+    print("Volta should not be run directly! Please use it as a module..")
