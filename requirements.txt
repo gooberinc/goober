@@ -8,3 +8,4 @@ better_profanity
 python-dotenv
 dotenv
 pillow
+asqlite

@@ -121,5 +121,5 @@
     "command_stats_embed_field2name": "Ferzje",
     "command_stats_embed_field2value": "Lokaal: {local_version} \nLêste: {latest_version}",
     "command_stats_embed_field3name": "Fariabel Info",
-    "command_stats_embed_field3value": "Namme: {NAME} \nFoarheaksel: {PREFIX} \nEigner ID: {ownerid} \nCooldown: {cooldown_time} \nPingrigel: {PING_LINE} \nUnthâld Dielen Ynskeakele: {showmemenabled} \nBrûkerstraining Ynskeakele: {USERTRAIN_ENABLED}\nLiet: {song} \nSplashtekst: ```{splashtext}```"
+    "command_stats_embed_field3value": "Namme: {NAME} \nFoarheaksel: {PREFIX} \nEigner ID: {ownerid}\nPingrigel: {PING_LINE} \nUnthâld Dielen Ynskeakele: {showmemenabled} \nBrûkerstraining Ynskeakele: {USERTRAIN_ENABLED}\nLiet: {song} \nSplashtekst: ```{splashtext}```"
 }
