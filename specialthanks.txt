@@ -1,3 +1,5 @@
-The catbox.moe team
-Charlie's Computers
-ctih1
+- The catbox.moe team for memory.json file uploads
+- Charlie's Computers
+- ctih1
+- RestartB (for the Fireboard cog from his Titanium bot)
+- Claude 4 Sonnet (for slightly modifying main.py and fireboard.py to work with Goober)
