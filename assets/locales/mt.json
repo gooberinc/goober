@@ -121,5 +121,5 @@
   "command_stats_embed_field2name": "Verżjoni",
   "command_stats_embed_field2value": "Lokali: {local_version} \nĠdida: {latest_version}",
   "command_stats_embed_field3name": "Informazzjoni Varjabbli",
-  "command_stats_embed_field3value": "Isem: {NAME} \nPrefiss: {PREFIX} \nID ta’ Sid: {ownerid} \nCooldown: {cooldown_time} \nPing line: {PING_LINE} \nImoħħar Memenja: {showmemenabled} \nUser Training Attiva: {USERTRAIN_ENABLED}\nKan ta’: {song} \nSplashtext: ```{splashtext}```"
+  "command_stats_embed_field3value": "Isem: {NAME} \nPrefiss: {PREFIX} \nID ta’ Sid: {ownerid}\nPing line: {PING_LINE} \nImoħħar Memenja: {showmemenabled} \nUser Training Attiva: {USERTRAIN_ENABLED}\nKan ta’: {song} \nSplashtext: ```{splashtext}```"
 }

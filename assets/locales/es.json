@@ -73,5 +73,5 @@
     "command_stats_embed_field2name": "Version", 
     "command_stats_embed_field2value": "Version local: {local_version} \nUltima version: {latest_version}", 
     "command_stats_embed_field3name": "informacion sobre las variables", 
-    "command_stats_embed_field3value": "Nombre: {NAME} \nPrefijo: {PREFIX} \nID del propietario: {ownerid} \nTiempo de reutilizacion: {cooldown_time} \nLinea de ping: {PING_LINE} \nCompartir memoria habilitada: {showmemenabled} \nEntrenamiento de usuario habilitado: {USERTRAIN_ENABLED} \nCancion: {song} \nTexto de bienvenida: ```{splashtext}```" 
+    "command_stats_embed_field3value": "Nombre: {NAME} \nPrefijo: {PREFIX} \nID del propietario: {ownerid}\nLinea de ping: {PING_LINE} \nCompartir memoria habilitada: {showmemenabled} \nEntrenamiento de usuario habilitado: {USERTRAIN_ENABLED} \nCancion: {song} \nTexto de bienvenida: ```{splashtext}```" 
 }

@@ -128,6 +128,6 @@
     "command_stats_embed_field2name": "Versio",
     "command_stats_embed_field2value": "Paikallinen: {local_version} \nUusin: {latest_version}",
     "command_stats_embed_field3name": "Muuttajainformaatio",
-    "command_stats_embed_field3value": "Nimi: {NAME} \nEtuliite: {PREFIX} \nOmistajan ID: {ownerid} \nJäähtymisaika: {cooldown_time} \nPing-linja: {PING_LINE} \nMuistin jako päällä: {showmemenabled} \nOppiminen käyttäjistä: {USERTRAIN_ENABLED}\nLaulu: {song} \nRoisketeksti: ```{splashtext}```"
+    "command_stats_embed_field3value": "Nimi: {NAME} \nEtuliite: {PREFIX} \nOmistajan ID: {ownerid}\nPing-linja: {PING_LINE} \nMuistin jako päällä: {showmemenabled} \nOppiminen käyttäjistä: {USERTRAIN_ENABLED}\nLaulu: {song} \nRoisketeksti: ```{splashtext}```"
 }
   
