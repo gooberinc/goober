@@ -48,6 +48,7 @@ def check_requirements():
     PACKAGE_ALIASES = {
         "discord": "discord.py",
         "better_profanity": "better-profanity",
+        "dotenv": "python-dotenv"
     }
 
     parent_dir = os.path.dirname(os.path.abspath(__file__))

@@ -39,6 +39,22 @@ def find_locales_dirs(base_path):
             dirs.remove('locales')
     return found
 
+def find_dotenv(start_path: pathlib.Path) -> pathlib.Path | None:
+    current = start_path.resolve()
+    while current != current.parent:
+        candidate = current / ".env"
+        if candidate.exists():
+            return candidate
+        current = current.parent
+    return None
+
+env_path = find_dotenv(pathlib.Path(__file__).parent)
+if env_path:
+    load_dotenv(dotenv_path=env_path)
+    print(f"[VOLTA] {GREEN}Loaded .env from {env_path}{RESET}")
+else:
+    print(f"[VOLTA] {YELLOW}No .env file found from {__file__} upwards.{RESET}")
+
 locales_dirs.extend(find_locales_dirs(module_dir))
 if working_dir != module_dir:
     locales_dirs.extend(find_locales_dirs(working_dir))
@@ -97,7 +113,7 @@ def check_missing_translations():
     global LOCALE, ENGLISH_MISSING
     load_translations()
     if FALLBACK_LOCALE not in translations:
-        print(f"[VOLTA] {RED}Fallback translations ({FALLBACK_LOCALE}.json) missing from assets/locales. Exiting.{RESET}")
+        print(f"[VOLTA] {RED}Fallback translations ({FALLBACK_LOCALE}.json) missing from assets/locales.{RESET}")
         ENGLISH_MISSING = True
         return
     if LOCALE == "en":
@@ -115,7 +131,7 @@ def check_missing_translations():
     if missing_count > 0:
         percent_missing = (missing_count / total_keys) * 100
         if percent_missing == 100:
-            print(f"[VOLTA] {RED}Warning: All keys are missing in locale '{LOCALE}'! Defaulting back to {FALLBACK_LOCALE}{RESET}")
+            print(f"[VOLTA] {YELLOW}Warning: All keys are missing in locale '{LOCALE}'! Defaulting back to {FALLBACK_LOCALE}{RESET}")
             set_language(FALLBACK_LOCALE)
         elif percent_missing > 0:
             print(f"{YELLOW}Warning: {missing_count}/{total_keys} keys missing in locale '{LOCALE}' ({percent_missing:.1f}%)!{RESET}")
@@ -134,9 +150,9 @@ def get_translation(lang: str, key: str):
         return lang_translations[key]
     else:
         if key not in translations.get(FALLBACK_LOCALE, {}):
-            return f"[VOLTA] {RED}Missing key: '{key}' in {FALLBACK_LOCALE}.json!{RESET}"
+            return f"[VOLTA] {YELLOW}Missing key: '{key}' in {FALLBACK_LOCALE}.json!{RESET}"
     fallback = translations.get(FALLBACK_LOCALE, {}).get(key, key)
-    print(f"[VOLTA] {RED}Missing key: '{key}' in language '{lang}', falling back to: '{fallback}' using {FALLBACK_LOCALE}.json{RESET}") # yeah probably print this
+    print(f"[VOLTA] {YELLOW}Missing key: '{key}' in language '{lang}', falling back to: '{fallback}' using {FALLBACK_LOCALE}.json{RESET}") # yeah probably print this
     return fallback
 
 def _(key: str) -> str:
