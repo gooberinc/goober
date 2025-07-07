@@ -130,6 +130,9 @@ def get_translation(lang: str, key: str):
     lang_translations = translations.get(lang, {})
     if key in lang_translations:
         return lang_translations[key]
+    else:
+        if key not in translations.get("en", {}):
+            return f"[VOLTA] {RED}Missing key: '{key}' in en.json!{RESET}"
     fallback = translations.get("en", {}).get(key, key)
     print(f"[VOLTA] {RED}Missing key: '{key}' in language '{lang}', falling back to: '{fallback}'{RESET}") # yeah probably print this
     return fallback
