@@ -63,9 +63,6 @@ bot: commands.Bot = commands.Bot(
     allowed_mentions=discord.AllowedMentions(everyone=False, roles=False, users=False, replied_user=True)
 )
 
-# Initialize database pool for fireboard functionality
-bot.fireboard_pool = None
-
 # Load memory and Markov model for text generation
 memory: List[str] = load_memory()
 markov_model: Optional[markovify.Text] = load_markov_model()
@@ -118,14 +115,6 @@ async def on_ready() -> None:
     folder_name: str = "cogs"
     if launched:
         return
-    
-    # Initialize database pool for fireboard functionality
-    try:
-        bot.fireboard_pool = await asqlite.create_pool("fireboard.db")
-        print(f"{GREEN}Database pool initialized successfully{RESET}")
-    except Exception as e:
-        print(f"{RED}Failed to initialize database pool: {e}{RESET}")
-        bot.fireboard_pool = None
         
     await load_cogs_from_folder(bot)
     try:
