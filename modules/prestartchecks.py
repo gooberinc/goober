@@ -1,6 +1,5 @@
 from modules.globalvars import *
-from modules.volta.main import _, get_translation, load_translations, set_language, translations
-
+from modules.volta.main import _, check_missing_translations
 import time
 import os
 import sys
@@ -26,30 +25,6 @@ def iscloned():
     else:
         print(f"{RED}{(_('not_cloned'))}{RESET}")
         sys.exit(1)
-
-def check_missing_translations():
-    if LOCALE == "en":
-        print("Locale is English, skipping missing key check.")
-        return
-    load_translations()
-
-    en_keys = set(translations.get("en", {}).keys())
-    locale_keys = set(translations.get(LOCALE, {}).keys())
-
-    missing_keys = en_keys - locale_keys
-    total_keys = len(en_keys)
-    missing_count = len(missing_keys)
-
-    if missing_count > 0:
-        percent_missing = (missing_count / total_keys) * 100
-        print(f"{YELLOW}Warning: {missing_count}/{total_keys} keys missing in locale '{LOCALE}' ({percent_missing:.1f}%)!{RESET}")
-        for key in sorted(missing_keys):
-            print(f"  - {key}")
-        time.sleep(5)
-    else:
-        print("All translation keys present for locale:", LOCALE)
-
-
 
 def get_stdlib_modules():
     stdlib_path = pathlib.Path(sysconfig.get_paths()['stdlib'])

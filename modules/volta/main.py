@@ -24,6 +24,7 @@ working_dir = pathlib.Path.cwd()
 EXCLUDE_DIRS = {'.git', '__pycache__'}
 
 locales_dirs = []
+ENGLISH_MISSING = False
 
 def find_locales_dirs(base_path):
     found = []
@@ -79,14 +80,53 @@ def reload_if_changed():
                     translations.pop(lang_code, None)
 
 def set_language(lang: str):
-    global LOCALE
+    global LOCALE, ENGLISH_MISSING
     if lang in translations:
         LOCALE = lang
     else:
         print(f"[VOLTA] {RED}Language '{lang}' not found, defaulting to 'en'{RESET}")
-        LOCALE = "en"
+        if "en" in translations:
+            LOCALE = "en"
+        else:
+            print(f"[VOLTA] {RED}The English translations cannot be found! No fallback available.{RESET}")
+            ENGLISH_MISSING = True
+
+def check_missing_translations():
+    global LOCALE, ENGLISH_MISSING
+    load_translations()
+    if "en" not in translations:
+        print(f"[VOLTA] {RED}English translations (en.json) missing from assets/locales. Exiting.{RESET}")
+        ENGLISH_MISSING = True
+        return
+    if LOCALE == "en":
+        print("Locale is English, skipping missing key check.")
+        return
+    
+
+    en_keys = set(translations.get("en", {}).keys())
+    locale_keys = set(translations.get(LOCALE, {}).keys())
+
+    missing_keys = en_keys - locale_keys
+    total_keys = len(en_keys)
+    missing_count = len(missing_keys)
+
+    if missing_count > 0:
+        percent_missing = (missing_count / total_keys) * 100
+        if percent_missing == 100:
+            print(f"[VOLTA] {RED}Warning: All keys are missing in locale '{LOCALE}'! Defaulting back to en{RESET}")
+            set_language("en")
+        elif percent_missing > 0:
+            print(f"{YELLOW}Warning: {missing_count}/{total_keys} keys missing in locale '{LOCALE}' ({percent_missing:.1f}%)!{RESET}")
+            for key in sorted(missing_keys):
+                print(f"  - {key}")
+            time.sleep(2)
+    else:
+        print("All translation keys present for locale:", LOCALE)
+
 
 def get_translation(lang: str, key: str):
+    if ENGLISH_MISSING:
+        return f"[VOLTA] {RED}No fallback available!{RESET}"
     lang_translations = translations.get(lang, {})
     if key in lang_translations:
         return lang_translations[key]
@@ -101,3 +141,4 @@ load_translations()
 
 watchdog_thread = threading.Thread(target=reload_if_changed, daemon=True)
 watchdog_thread.start()
+
