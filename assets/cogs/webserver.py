@@ -60,7 +60,7 @@ class GooberWeb(commands.Cog):
             try:
                 user = await self.bot.fetch_user(int(user_id))
                 blacklisted_users.append({
-                    "name": f"{user.name}#{user.discriminator}",
+                    "name": f"{user.name}",
                     "avatar_url": str(user.avatar.url) if user.avatar else str(user.default_avatar.url),
                     "id": user.id
                 })
@@ -158,7 +158,7 @@ class GooberWeb(commands.Cog):
         self._update_command_stats(command.name, interaction.user)
     
     def _update_command_stats(self, command_name, user):
-        self.last_command = f"{command_name} (by {user.name}#{user.discriminator})"
+        self.last_command = f"{command_name} (by {user.name})"
         self.last_command_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         if self.websockets:
             asyncio.create_task(self.update_clients())
@@ -380,7 +380,7 @@ class GooberWeb(commands.Cog):
         if owner_id:
             try:
                 owner = await self.bot.fetch_user(int(owner_id))
-                owner_username = f"{owner.name}#{owner.discriminator}"
+                owner_username = f"{owner.name}"
                 owner_pfp = str(owner.avatar.url) if owner and owner.avatar else ""
             except:
                 pass
