@@ -10,6 +10,7 @@ ANSI = "\033["
 RED = f"{ANSI}31m"
 GREEN = f"{ANSI}32m"
 YELLOW = f"{ANSI}33m"
+PURPLE = f"{ANSI}35m"
 DEBUG = f"{ANSI}1;30m"
 RESET = f"{ANSI}0m"
 VERSION_URL = "https://goober.expect.ovh"
@@ -40,5 +41,5 @@ latest_version = "0.0.0"
 local_version = "2.1.3"
 os.environ['gooberlocal_version'] = local_version
 REACT = os.getenv("REACT")
-beta = False # this makes goober think its a beta version, so it will not update to the latest stable version or run any version checks
+beta = True # this makes goober think its a beta version, so it will not update to the latest stable version or run any version checks
     

@@ -11,9 +11,25 @@ import uuid
 import asyncio
 import sys
 from typing import List, Dict, Set, Optional, Tuple, Any, Union, Callable, Coroutine, TypeVar, Type
-
+import logging
 from modules.globalvars import *
 from modules.prestartchecks import start_checks
+from modules.logger import GooberFormatter
+import logging
+
+logger = logging.getLogger("goober")
+logger.setLevel(logging.DEBUG)
+
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.DEBUG)
+console_handler.setFormatter(GooberFormatter())
+
+file_handler = logging.FileHandler("log.txt", mode="w+", encoding="UTF-8")
+file_handler.setLevel(logging.DEBUG)
+file_handler.setFormatter(GooberFormatter(colors=False))
+
+logger.addHandler(console_handler)
+logger.addHandler(file_handler)
 
 # Print splash text and check for updates
 print(splashtext)  # Print splash text (from modules/globalvars.py)
@@ -65,7 +81,7 @@ bot: commands.Bot = commands.Bot(
 memory: List[str] = load_memory()
 markov_model: Optional[markovify.Text] = load_markov_model()
 if not markov_model:
-    print(f"{RED}{(_('markov_model_not_found'))}{RESET}")
+    logger.error(_('markov_model_not_found'))
     memory = load_memory()
     markov_model = train_markov_model(memory)
 
@@ -79,9 +95,9 @@ async def load_cogs_from_folder(bot, folder_name="assets/cogs"):
             module_path = folder_name.replace("/", ".").replace("\\", ".") + f".{cog_name}"
             try:
                 await bot.load_extension(module_path)
-                print(f"{GREEN}{(_('loaded_cog'))} {cog_name}{RESET}")
+                logger.info(f"{(_('loaded_cog'))} {cog_name}")
             except Exception as e:
-                print(f"{RED}{(_('cog_fail'))} {cog_name} {e}{RESET}")
+                logger.error(f"{(_('cog_fail'))} {cog_name} {e}")
                 traceback.print_exc()
 
 async def fetch_active_users() -> str:
@@ -92,7 +108,7 @@ async def fetch_active_users() -> str:
         else:
             return "?"
     except Exception as e:
-        print(f"{RED}{(_('error_fetching_active_users'))}{RESET} {e}")
+        logger.e(f"{_('error_fetching_active_users')} {RESET} {e}")
         return "?"
 
 async def send_alive_ping_periodically() -> None:
@@ -100,7 +116,7 @@ async def send_alive_ping_periodically() -> None:
         try:
             requests.post(f"{VERSION_URL}/aliveping", json={"name": NAME})
         except Exception as e:
-            print(f"{RED}{(_('error_sending_alive_ping'))}{RESET} {e}")
+            logger.error(f"{(_('error_sending_alive_ping'))}{RESET} {e}")
         await asyncio.sleep(60)
 
 # Event: Called when the bot is ready
@@ -117,21 +133,21 @@ async def on_ready() -> None:
     await load_cogs_from_folder(bot)
     try:
         synced: List[discord.app_commands.AppCommand] = await bot.tree.sync()
-        print(f"{GREEN}{_('synced_commands')} {len(synced)} {(_('synced_commands2'))} {RESET}")
+        logger.info(f"{_('synced_commands')} {len(synced)} {(_('synced_commands2'))}")
         slash_commands_enabled = True
         ping_server()  # ping_server from modules/central.py
         
         active_users: str = await fetch_active_users()
-        print(f"{GREEN}{(_('active_users:'))} {active_users}{RESET}")
-        print(f"{GREEN}{(_('started')).format(name=NAME)}{RESET}")
+        logger.info(f"{(_('active_users:'))} {active_users}")
+        logger.info(f"{(_('started')).format(name=NAME)}")
 
         bot.loop.create_task(send_alive_ping_periodically())
     except discord.errors.Forbidden as perm_error:
-        print(f"{RED}Permission error while syncing commands: {perm_error}{RESET}") 
-        print(f"{RED}Make sure the bot has the 'applications.commands' scope and is invited with the correct permissions.{RESET}")
+        logger.error(f"Permission error while syncing commands: {perm_error}") 
+        logger.error("Make sure the bot has the 'applications.commands' scope and is invited with the correct permissions.")
         quit()
     except Exception as e:
-        print(f"{RED}{(_('fail_commands_sync'))} {e}{RESET}")
+        logger.error(f"{_('fail_commands_sync')} {e}")
         traceback.print_exc()
         quit()
         
@@ -181,13 +197,13 @@ async def retrain(ctx: commands.Context) -> None:
     for i, data in enumerate(memory):
         processed_data += 1
         if processed_data % 1000 == 0 or processed_data == data_size:
-            await send_message(ctx, f"{(_('command_markov_retraining')).format(processed_data=processed_data, data_size=data_size)}", edit=True, message_reference=processing_message_ref)
+            await send_message(ctx, f"{_('command_markov_retraining').format(processed_data=processed_data, data_size=data_size)}", edit=True, message_reference=processing_message_ref)
 
     global markov_model
     markov_model = train_markov_model(memory)
     save_markov_model(markov_model)
 
-    await send_message(ctx, f"{(_('command_markov_retrain_successful')).format(data_size=data_size)}", edit=True, message_reference=processing_message_ref)
+    await send_message(ctx, f"{_('command_markov_retrain_successful').format(data_size=data_size)}", edit=True, message_reference=processing_message_ref)
 
 # Command: Generate a sentence using the Markov model
 @bot.hybrid_command(description=f"{(_('command_desc_talk'))}")
@@ -219,7 +235,7 @@ async def talk(ctx: commands.Context, sentence_size: int = 5) -> None:
             combined_message: str = f"{coherent_response}\n[jif]({gif_url})"
         else:
             combined_message: str = coherent_response
-        print(combined_message)
+        logger.info(combined_message)
         os.environ['gooberlatestgen'] = combined_message
         await send_message(ctx, combined_message)
     else:
@@ -247,7 +263,7 @@ async def impact(ctx: commands.Context) -> None:
         else:
             fallback_image: Optional[str] = get_random_asset_image()
             if fallback_image is None:
-                await ctx.reply((_('no_image_available')))
+                await ctx.reply(_('no_image_available'))
                 return
             temp_input = tempfile.mktemp(suffix=os.path.splitext(fallback_image)[1])
             shutil.copy(fallback_image, temp_input)
@@ -255,7 +271,7 @@ async def impact(ctx: commands.Context) -> None:
     else:
         fallback_image = get_random_asset_image()
         if fallback_image is None:
-            await ctx.reply((_('no_image_available')))
+            await ctx.reply(_('no_image_available'))
             return
         temp_input = tempfile.mktemp(suffix=os.path.splitext(fallback_image)[1])
         shutil.copy(fallback_image, temp_input)
@@ -266,7 +282,7 @@ async def impact(ctx: commands.Context) -> None:
     if output_path is None or not os.path.isfile(output_path):
         if temp_input and os.path.exists(temp_input):
             os.remove(temp_input)
-        await ctx.reply((_('failed_generate_image')))
+        await ctx.reply(_('failed_generate_image'))
         return
 
     await ctx.send(file=discord.File(output_path))
@@ -296,7 +312,7 @@ async def demotivator(ctx: commands.Context) -> None:
         else:
             fallback_image: Optional[str] = get_random_asset_image()
             if fallback_image is None:
-                await ctx.reply((_('no_image_available')))
+                await ctx.reply(_('no_image_available'))
                 return
             temp_input = tempfile.mktemp(suffix=os.path.splitext(fallback_image)[1])
             shutil.copy(fallback_image, temp_input)
@@ -304,7 +320,7 @@ async def demotivator(ctx: commands.Context) -> None:
     else:
         fallback_image = get_random_asset_image()
         if fallback_image is None:
-            await ctx.reply((_('no_image_available')))
+            await ctx.reply(_('no_image_available'))
             return
         temp_input = tempfile.mktemp(suffix=os.path.splitext(fallback_image)[1])
         shutil.copy(fallback_image, temp_input)
@@ -375,7 +391,7 @@ async def on_message(message: discord.Message) -> None:
         return
 
     if message.content.startswith((f"{PREFIX}talk", f"{PREFIX}mem", f"{PREFIX}help", f"{PREFIX}stats", f"{PREFIX}")):
-        print(f"{(_('command_ran')).format(message=message)}")
+        logger.info(f"{(_('command_ran')).format(message=message)}")
         await bot.process_commands(message)
         return
 
@@ -399,14 +415,14 @@ async def on_message(message: discord.Message) -> None:
             try:
                 await message.add_reaction(emoji)
             except Exception as e:
-                print(f"Failed to react with emoji: {e}")
+                logger.info(f"Failed to react with emoji: {e}")
 
     await bot.process_commands(message)
 
 # Event: Called on every interaction (slash command, etc.)
 @bot.event
 async def on_interaction(interaction: discord.Interaction) -> None:
-    print(f"{(_('command_ran_s')).format(interaction=interaction)}{interaction.data['name']}")
+    logger.info(f"{(_('command_ran_s')).format(interaction=interaction)}{interaction.data['name']}")
 
 # Global check: Block blacklisted users from running commands
 @bot.check
@@ -415,11 +431,11 @@ async def block_blacklisted(ctx: commands.Context) -> bool:
         try:
             if isinstance(ctx, discord.Interaction):
                 if not ctx.response.is_done():
-                    await ctx.response.send_message((_('blacklisted')), ephemeral=True)
+                    await ctx.response.send_message(_('blacklisted'), ephemeral=True)
                 else:
-                    await ctx.followup.send((_('blacklisted')), ephemeral=True)
+                    await ctx.followup.send(_('blacklisted'), ephemeral=True)
             else:
-                await ctx.send((_('blacklisted_user')), ephemeral=True)
+                await ctx.send(_('blacklisted_user'), ephemeral=True)
         except:
             pass
         return False
@@ -483,7 +499,7 @@ async def mem(ctx: commands.Context) -> None:
         return
     command: str = """curl -F "reqtype=fileupload" -F "time=1h" -F "fileToUpload=@memory.json" https://litterbox.catbox.moe/resources/internals/api.php"""
     memorylitter: subprocess.CompletedProcess = subprocess.run(command, shell=True, capture_output=True, text=True)
-    print(memorylitter)
+    logger.debug(memorylitter)
     await send_message(ctx, memorylitter.stdout.strip())
 
 # Helper: Improve sentence coherence (simple capitalization fix)

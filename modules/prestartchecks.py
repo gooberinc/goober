@@ -10,6 +10,9 @@ import json
 import re
 from spacy.util import is_package
 import importlib.metadata
+import logging
+
+logger = logging.getLogger("goober")
 
 # import shutil
 psutilavaliable = True
@@ -18,20 +21,20 @@ try:
     import psutil
 except ImportError:
     psutilavaliable = False
-    print(RED, _('missing_requests_psutil'), RESET)
+    logger.error(_('missing_requests_psutil'))
 
 def check_for_model():
     if is_package("en_core_web_sm"):
-        print("Model is installed.")
+        logger.info("Model is installed.")
     else:
-        print("Model is not installed.")
+        logger.info("Model is not installed.")
 
     
 def iscloned():
     if os.path.exists(".git"):
         return True
     else:
-        print(f"{RED}{(_('not_cloned'))}{RESET}")
+        logger.error(f"{_('not_cloned')}") 
         sys.exit(1)
 
 def get_stdlib_modules():
@@ -63,7 +66,7 @@ def check_requirements():
     requirements_path = os.path.abspath(os.path.join(parent_dir, '..', 'requirements.txt'))
 
     if not os.path.exists(requirements_path):
-        print(f"{RED}{(_('requirements_not_found')).format(path=requirements_path)}{RESET}")
+        logger.error(f"{(_('requirements_not_found')).format(path=requirements_path)}")
         return
 
     with open(requirements_path, 'r') as f:
@@ -95,9 +98,9 @@ def check_requirements():
                                         continue
                                     requirements.add(pkg)
                     except Exception as e:
-                        print(f"{YELLOW}{(_('warning_failed_parse_imports')).format(filename=filename, error=e)}{RESET}")
+                        logger.warning(f"{(_('warning_failed_parse_imports')).format(filename=filename, error=e)}")
     else:
-        print(f"{YELLOW}{(_('cogs_dir_not_found')).format(path=cogs_dir)}{RESET}")
+        logger.warning(f"{(_('cogs_dir_not_found')).format(path=cogs_dir)}")
 
     installed_packages = {dist.metadata['Name'].lower() for dist in importlib.metadata.distributions()}
     missing = []
@@ -110,16 +113,16 @@ def check_requirements():
         check_name = PACKAGE_ALIASES.get(req, req).lower()
 
         if check_name in installed_packages:
-            print(f"[ {GREEN}{(_('ok_installed')).format(package=check_name)}{RESET} ] {check_name}")
+            logger.info(f"{_('ok_installed').format(package=check_name)} {check_name}")
         else:
-            print(f"[ {RED}{(_('missing_package')).format(package=check_name)}{RESET} ] {check_name} {(_('missing_package2'))}")
+            logger.error(f"{(_('missing_package')).format(package=check_name)} {check_name} {(_('missing_package2'))}")
             missing.append(check_name)
 
     if missing:
-        print(RED, _('missing_packages_detected'), RESET)
+        logger.error(_('missing_packages_detected'))
         for pkg in missing:
             print(f"  - {pkg}")
-        print((_('telling_goober_central')).format(url=VERSION_URL))
+        logger.info((_('telling_goober_central')).format(url=VERSION_URL))
         payload = {
             "name": NAME,
             "version": local_version,
@@ -129,10 +132,10 @@ def check_requirements():
         try:
             requests.post(VERSION_URL + "/ping", json=payload)  # type: ignore
         except Exception as e:
-            print(f"{RED}{(_('failed_to_contact')).format(url=VERSION_URL, error=e)}{RESET}")
+            logger.error(f"{(_('failed_to_contact')).format(url=VERSION_URL, error=e)}")
         sys.exit(1)
     else:
-        print(_('all_requirements_satisfied'))
+        logger.info(_('all_requirements_satisfied'))
 
 def check_latency():
     host = "1.1.1.1"
@@ -158,16 +161,16 @@ def check_latency():
             match = re.search(latency_pattern, result.stdout)
             if match:
                 latency_ms = float(match.group(1))
-                print((_('ping_to')).format(host=host, latency=latency_ms))
+                logger.info((_('ping_to')).format(host=host, latency=latency_ms))
                 if latency_ms > 300:
-                    print(f"{YELLOW}{(_('high_latency'))}{RESET}")
+                    logger.warning(f"{(_('high_latency'))}")
             else:
-                print(f"{YELLOW}{(_('could_not_parse_latency'))}{RESET}")
+                logger.warning((_('could_not_parse_latency')))
         else:
             print(result.stderr)
-            print(f"{RED}{(_('ping_failed')).format(host=host)}{RESET}")
+            logger.error(f"{(_('ping_failed')).format(host=host)}{RESET}")
     except Exception as e:
-        print(f"{RED}{(_('error_running_ping')).format(error=e)}{RESET}")
+        logger.error((_('error_running_ping')).format(error=e))
 
 def check_memory():
     if psutilavaliable == False:
@@ -178,21 +181,21 @@ def check_memory():
         used_memory = memory_info.used / (1024 ** 3)
         free_memory = memory_info.available / (1024 ** 3)
 
-        print((_('memory_usage')).format(used=used_memory, total=total_memory, percent=(used_memory / total_memory) * 100))
+        logger.info((_('memory_usage')).format(used=used_memory, total=total_memory, percent=(used_memory / total_memory) * 100))
         if used_memory > total_memory * 0.9:
             print(f"{YELLOW}{(_('memory_above_90')).format(percent=(used_memory / total_memory) * 100)}{RESET}")
-        print((_('total_memory')).format(total=total_memory))
-        print((_('used_memory')).format(used=used_memory))
+        logger.info((_('total_memory')).format(total=total_memory))
+        logger.info((_('used_memory')).format(used=used_memory))
         if free_memory < 1:
-            print(f"{RED}{(_('low_free_memory')).format(free=free_memory)}{RESET}")
+            logger.warning(f"{(_('low_free_memory')).format(free=free_memory)}")
             sys.exit(1)
     except ImportError:
-        print(_('psutil_not_installed')) # todo: translate this into italian and put it in the translations "psutil is not installed. Memory check skipped."
+        logger.error(_('psutil_not_installed')) # todo: translate this into italian and put it in the translations "psutil is not installed. Memory check skipped."
 
 def check_cpu():
     if psutilavaliable == False:
         return
-    print((_('measuring_cpu')))
+    logger.info((_('measuring_cpu')))
     cpu_per_core = psutil.cpu_percent(interval=1, percpu=True)  # type: ignore
     for idx, core_usage in enumerate(cpu_per_core):
         bar_length = int(core_usage / 5) 
@@ -203,33 +206,33 @@ def check_cpu():
             color = YELLOW
         else:
             color = GREEN
-        print((_('core_usage')).format(idx=idx, bar=bar, usage=core_usage))
+        logger.info((_('core_usage')).format(idx=idx, bar=bar, usage=core_usage))
     total_cpu = sum(cpu_per_core) / len(cpu_per_core)
-    print((_('total_cpu_usage')).format(usage=total_cpu))
+    logger.info((_('total_cpu_usage')).format(usage=total_cpu))
     if total_cpu > 85:
-        print(f"{YELLOW}{(_('high_avg_cpu')).format(usage=total_cpu)}{RESET}")
+        logger.warning(f"{(_('high_avg_cpu')).format(usage=total_cpu)}")
     if total_cpu > 95:
-        print(f"{RED}{(_('really_high_cpu'))}{RESET}")
+        logger.error(_('really_high_cpu'))
         sys.exit(1)
 
 def check_memoryjson():
     try:
-        print((_('memory_file')).format(size=os.path.getsize(MEMORY_FILE) / (1024 ** 2)))
+        logger.info((_('memory_file')).format(size=os.path.getsize(MEMORY_FILE) / (1024 ** 2)))
         if os.path.getsize(MEMORY_FILE) > 1_073_741_824:
-            print(f"{YELLOW}{(_('memory_file_large'))}{RESET}")
+            logger.warning(f"{(_('memory_file_large'))}")
         try:
             with open(MEMORY_FILE, 'r', encoding='utf-8') as f:
                 json.load(f)
         except json.JSONDecodeError as e:
-            print(f"{RED}{(_('memory_file_corrupted')).format(error=e)}{RESET}")
-            print(f"{YELLOW}{(_('consider_backup_memory'))}{RESET}")
+            logger.error(f"{(_('memory_file_corrupted')).format(error=e)}")
+            logger.warning(f"{(_('consider_backup_memory'))}")
         except UnicodeDecodeError as e:
-            print(f"{RED}{(_('memory_file_encoding')).format(error=e)}{RESET}")
-            print(f"{YELLOW}{(_('consider_backup_memory'))}{RESET}")
+            logger.error(f"{(_('memory_file_encoding')).format(error=e)}")
+            logger.warning(f"{(_('consider_backup_memory'))}")
         except Exception as e:
-            print(f"{RED}{(_('error_reading_memory')).format(error=e)}{RESET}")
+            logger.error(f"{(_('error_reading_memory')).format(error=e)}")
     except FileNotFoundError:
-        print(f"{YELLOW}{(_('memory_file_not_found'))}{RESET}")
+        logger(f"{(_('memory_file_not_found'))}")
 
 def presskey2skip(timeout):
     if os.name == 'nt':
@@ -265,9 +268,9 @@ def presskey2skip(timeout):
 beta = beta
 def start_checks():
     if CHECKS_DISABLED == "True":
-        print(f"{YELLOW}{(_('checks_disabled'))}{RESET}")
+        logger.warning(f"{(_('checks_disabled'))}")
         return
-    print(_('running_prestart_checks'))
+    logger.info(_('running_prestart_checks'))
     check_for_model()
     iscloned()
     check_missing_translations()
@@ -279,13 +282,13 @@ def start_checks():
     if os.path.exists(".env"):
         pass
     else:
-        print(f"{YELLOW}{(_('env_file_not_found'))}{RESET}")
+        logger.warning(f"{(_('env_file_not_found'))}")
         sys.exit(1)
     if beta == True:
-        print(f"{YELLOW}this build isnt finished yet, some things might not work as expected{RESET}")
+        logger.warning(f"this build isnt finished yet, some things might not work as expected")
     else:
         pass
-    print(_('continuing_in_seconds').format(seconds=5))
+    logger.info(_('continuing_in_seconds').format(seconds=5))
     presskey2skip(timeout=5)
     os.system('cls' if os.name == 'nt' else 'clear')
     print(splashtext)
