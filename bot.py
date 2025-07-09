@@ -468,7 +468,8 @@ async def about(ctx: commands.Context) -> None:
     embed: discord.Embed = discord.Embed(title=f"{(_('command_about_embed_title'))}", description="", color=Colour(0x000000))
     embed.add_field(name=f"{(_('command_about_embed_field1'))}", value=f"{NAME}", inline=False)
     embed.add_field(name=f"{(_('command_about_embed_field2name'))}", value=f"{(_('command_about_embed_field2value')).format(local_version=local_version, latest_version=latest_version)}", inline=False)
-
+    embed.add_field(name=f"Github", value=f"https://github.com/gooberinc/goober")
+    
     await send_message(ctx, embed=embed)
 
 # Command: Show bot statistics (admin only)

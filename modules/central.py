@@ -54,7 +54,7 @@ def is_name_available(NAME):
             return data.get("available", False)
         else:
             # Print error if request failed
-            logger.e(f"{(_('name_check'))}", response.json())
+            logger.error(f"{(_('name_check'))}", response.json())
             return False
     except Exception as e:
         # Print exception if request failed
@@ -69,7 +69,7 @@ def register_name(NAME):
             return
         # Check if the name is available
         if not is_name_available(NAME):
-            if os.getenv("gooberTOKEN"):
+            if os.getenv("GOOBERTOKEN"):
                 return
             # Name taken: print error and exit
             logger.critical(f"{(_('name_taken'))}")
