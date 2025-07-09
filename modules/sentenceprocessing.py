@@ -6,17 +6,20 @@ import spacy
 from spacy.tokens import Doc
 from spacytextblob.spacytextblob import SpacyTextBlob
 
+import logging
+logger = logging.getLogger("goober")
+
 
 def check_resources():
     try:
         nlp = spacy.load("en_core_web_sm")
     except OSError:
-        print((_('spacy_model_not_found')))
+        logging.critical((_('spacy_model_not_found')))
         spacy.cli.download("en_core_web_sm")
         nlp = spacy.load("en_core_web_sm")
     if "spacytextblob" not in nlp.pipe_names:
         nlp.add_pipe("spacytextblob")
-    print((_('spacy_initialized')))
+    logger.info((_('spacy_initialized')))
 
 check_resources()
 
@@ -28,8 +31,8 @@ def is_positive(sentence):
     doc = nlp(sentence)
     sentiment_score = doc._.polarity  # from spacytextblob
 
-    debug_message = f"{DEBUG}{(_('sentence_positivity'))} {sentiment_score}{RESET}"
-    print(debug_message)
+    debug_message = f"{(_('sentence_positivity'))} {sentiment_score}{RESET}"
+    logger.debug(debug_message)
 
     return sentiment_score > 0.6 # had to raise the bar because it kept saying "death to jews" was fine and it kept reacting to them
 

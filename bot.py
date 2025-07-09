@@ -31,13 +31,6 @@ file_handler.setFormatter(GooberFormatter(colors=False))
 logger.addHandler(console_handler)
 logger.addHandler(file_handler)
 
-logger.debug("Testing logging")
-logger.info("Testing logging")
-logger.warning("Testing logging")
-logger.error("Testing logging")
-logger.critical("Testing logging")
-
-
 # Print splash text and check for updates
 print(splashtext)  # Print splash text (from modules/globalvars.py)
 start_checks()
@@ -204,13 +197,13 @@ async def retrain(ctx: commands.Context) -> None:
     for i, data in enumerate(memory):
         processed_data += 1
         if processed_data % 1000 == 0 or processed_data == data_size:
-            await send_message(ctx, f"{(_('command_markov_retraining')).format(processed_data=processed_data, data_size=data_size)}", edit=True, message_reference=processing_message_ref)
+            await send_message(ctx, f"{_('command_markov_retraining').format(processed_data=processed_data, data_size=data_size)}", edit=True, message_reference=processing_message_ref)
 
     global markov_model
     markov_model = train_markov_model(memory)
     save_markov_model(markov_model)
 
-    await send_message(ctx, f"{(_('command_markov_retrain_successful')).format(data_size=data_size)}", edit=True, message_reference=processing_message_ref)
+    await send_message(ctx, f"{_('command_markov_retrain_successful').format(data_size=data_size)}", edit=True, message_reference=processing_message_ref)
 
 # Command: Generate a sentence using the Markov model
 @bot.hybrid_command(description=f"{(_('command_desc_talk'))}")
@@ -270,7 +263,7 @@ async def impact(ctx: commands.Context) -> None:
         else:
             fallback_image: Optional[str] = get_random_asset_image()
             if fallback_image is None:
-                await ctx.reply((_('no_image_available')))
+                await ctx.reply(_('no_image_available'))
                 return
             temp_input = tempfile.mktemp(suffix=os.path.splitext(fallback_image)[1])
             shutil.copy(fallback_image, temp_input)
@@ -278,7 +271,7 @@ async def impact(ctx: commands.Context) -> None:
     else:
         fallback_image = get_random_asset_image()
         if fallback_image is None:
-            await ctx.reply((_('no_image_available')))
+            await ctx.reply(_('no_image_available'))
             return
         temp_input = tempfile.mktemp(suffix=os.path.splitext(fallback_image)[1])
         shutil.copy(fallback_image, temp_input)
@@ -289,7 +282,7 @@ async def impact(ctx: commands.Context) -> None:
     if output_path is None or not os.path.isfile(output_path):
         if temp_input and os.path.exists(temp_input):
             os.remove(temp_input)
-        await ctx.reply((_('failed_generate_image')))
+        await ctx.reply(_('failed_generate_image'))
         return
 
     await ctx.send(file=discord.File(output_path))
@@ -319,7 +312,7 @@ async def demotivator(ctx: commands.Context) -> None:
         else:
             fallback_image: Optional[str] = get_random_asset_image()
             if fallback_image is None:
-                await ctx.reply((_('no_image_available')))
+                await ctx.reply(_('no_image_available'))
                 return
             temp_input = tempfile.mktemp(suffix=os.path.splitext(fallback_image)[1])
             shutil.copy(fallback_image, temp_input)
@@ -327,7 +320,7 @@ async def demotivator(ctx: commands.Context) -> None:
     else:
         fallback_image = get_random_asset_image()
         if fallback_image is None:
-            await ctx.reply((_('no_image_available')))
+            await ctx.reply(_('no_image_available'))
             return
         temp_input = tempfile.mktemp(suffix=os.path.splitext(fallback_image)[1])
         shutil.copy(fallback_image, temp_input)
@@ -438,11 +431,11 @@ async def block_blacklisted(ctx: commands.Context) -> bool:
         try:
             if isinstance(ctx, discord.Interaction):
                 if not ctx.response.is_done():
-                    await ctx.response.send_message((_('blacklisted')), ephemeral=True)
+                    await ctx.response.send_message(_('blacklisted'), ephemeral=True)
                 else:
-                    await ctx.followup.send((_('blacklisted')), ephemeral=True)
+                    await ctx.followup.send(_('blacklisted'), ephemeral=True)
             else:
-                await ctx.send((_('blacklisted_user')), ephemeral=True)
+                await ctx.send(_('blacklisted_user'), ephemeral=True)
         except:
             pass
         return False

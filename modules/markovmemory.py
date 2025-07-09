@@ -4,7 +4,8 @@ import markovify
 import pickle
 from modules.globalvars import *
 from modules.volta.main import _
-
+import logging
+logger = logging.getLogger("goober")
 # Get file size and line count for a given file path
 def get_file_info(file_path):
     try:
@@ -47,15 +48,15 @@ def train_markov_model(memory, additional_data=None):
 def save_markov_model(model, filename='markov_model.pkl'):
     with open(filename, 'wb') as f:
         pickle.dump(model, f)
-    print(f"Markov model saved to {filename}.")
+    logger.info(f"Markov model saved to {filename}.")
 
 # Load the Markov model from a pickle file
 def load_markov_model(filename='markov_model.pkl'):
     try:
         with open(filename, 'rb') as f:
             model = pickle.load(f)
-        print(f"{GREEN}{_('model_loaded')} {filename}.{RESET}")
+        logger.info(f"{_('model_loaded')} {filename}.{RESET}")
         return model
     except FileNotFoundError:
-        print(f"{RED}{filename} {_('not_found')}{RESET}")
+        logger.error(f"{filename} {_('not_found')}{RESET}")
         return None
