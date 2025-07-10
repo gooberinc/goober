@@ -45,7 +45,6 @@ from discord.abc import Messageable
 from better_profanity import profanity
 from discord.ext import commands
 
-from modules.central import ping_server
 from modules.volta.main import _, set_language
 from modules.markovmemory import *
 from modules.version import *
@@ -135,7 +134,6 @@ async def on_ready() -> None:
         synced: List[discord.app_commands.AppCommand] = await bot.tree.sync()
         logger.info(f"{_('synced_commands')} {len(synced)} {(_('synced_commands2'))}")
         slash_commands_enabled = True
-        ping_server()  # ping_server from modules/central.py
         
         active_users: str = await fetch_active_users()
         logger.info(f"{(_('active_users:'))} {active_users}")
