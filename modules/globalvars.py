@@ -38,8 +38,8 @@ arch = platform.machine()
 slash_commands_enabled = True # 100% broken, its a newer enough version so its probably enabled by default.... fix this at somepoint or hard code it in goober central code
 launched = False
 latest_version = "0.0.0"
-local_version = "2.1.3"
+local_version = "2.1.4"
 os.environ['gooberlocal_version'] = local_version
 REACT = os.getenv("REACT")
-beta = True # this makes goober think its a beta version, so it will not update to the latest stable version or run any version checks
+beta = False # this makes goober think its a beta version, so it will not update to the latest stable version or run any version checks
     
