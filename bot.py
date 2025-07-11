@@ -45,7 +45,6 @@ from discord.abc import Messageable
 from better_profanity import profanity
 from discord.ext import commands
 
-from modules.central import ping_server
 from modules.volta.main import _, set_language
 from modules.markovmemory import *
 from modules.version import *
@@ -135,7 +134,6 @@ async def on_ready() -> None:
         synced: List[discord.app_commands.AppCommand] = await bot.tree.sync()
         logger.info(f"{_('synced_commands')} {len(synced)} {(_('synced_commands2'))}")
         slash_commands_enabled = True
-        ping_server()  # ping_server from modules/central.py
         
         active_users: str = await fetch_active_users()
         logger.info(f"{(_('active_users:'))} {active_users}")
@@ -468,7 +466,8 @@ async def about(ctx: commands.Context) -> None:
     embed: discord.Embed = discord.Embed(title=f"{(_('command_about_embed_title'))}", description="", color=Colour(0x000000))
     embed.add_field(name=f"{(_('command_about_embed_field1'))}", value=f"{NAME}", inline=False)
     embed.add_field(name=f"{(_('command_about_embed_field2name'))}", value=f"{(_('command_about_embed_field2value')).format(local_version=local_version, latest_version=latest_version)}", inline=False)
-
+    embed.add_field(name=f"Github", value=f"https://github.com/gooberinc/goober")
+    
     await send_message(ctx, embed=embed)
 
 # Command: Show bot statistics (admin only)

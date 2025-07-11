@@ -18,7 +18,7 @@ RESET = f"{ANSI}0m"
 
 load_dotenv()
 
-LOCALE = os.getenv("locale")
+LOCALE = os.getenv("LOCALE")
 module_dir = pathlib.Path(__file__).parent.parent
 working_dir = pathlib.Path.cwd()
 EXCLUDE_DIRS = {'.git', '__pycache__'}
