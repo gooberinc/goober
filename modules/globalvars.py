@@ -2,6 +2,16 @@ import os
 import platform
 from dotenv import load_dotenv
 import pathlib
+import subprocess
+def get_git_branch():
+    try:
+        branch = subprocess.check_output(
+            ["git", "rev-parse", "--abbrev-ref", "HEAD"],
+            stderr=subprocess.DEVNULL
+        ).decode('utf-8').strip()
+        return branch
+    except subprocess.CalledProcessError:
+        return None
 
 env_path = pathlib.Path(__file__).parent.parent / '.env'
 load_dotenv(dotenv_path=env_path)
@@ -42,5 +52,7 @@ latest_version = "0.0.0"
 local_version = "2.3.0"
 os.environ['gooberlocal_version'] = local_version
 REACT = os.getenv("REACT")
-beta = False # this makes goober think its a beta version, so it will not update to the latest stable version or run any version checks
+if get_git_branch() == "dev":
+    beta = True
+ # this makes goober think its a beta version, so it will not update to the latest stable version or run any version checks
     
