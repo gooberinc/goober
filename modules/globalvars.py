@@ -55,4 +55,5 @@ REACT = os.getenv("REACT")
 if get_git_branch() == "dev":
     beta = True
  # this makes goober think its a beta version, so it will not update to the latest stable version or run any version checks
-    
+else:
+    beta = False
