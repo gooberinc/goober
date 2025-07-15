@@ -66,7 +66,7 @@
     "synced_commands": "Synced",
     "synced_commands2": "commands!",
     "fail_commands_sync": "Failed to sync commands:",
-    "started": "{name} has started!\n You're the star of the show now baby!",
+    "started": "{name} has started!\nYou're the star of the show now baby!",
     "name_check": "Error checking name availability:",
     "name_taken": "Name is already taken. Please choose a different name.",
     "name_check2": "Error during name availability check:",
