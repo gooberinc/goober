@@ -42,5 +42,5 @@ latest_version = "0.0.0"
 local_version = "2.3.0"
 os.environ['gooberlocal_version'] = local_version
 REACT = os.getenv("REACT")
-beta = True # this makes goober think its a beta version, so it will not update to the latest stable version or run any version checks
+beta = False # this makes goober think its a beta version, so it will not update to the latest stable version or run any version checks
     
