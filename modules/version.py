@@ -62,7 +62,7 @@ def get_latest_version_info():
             return data
         except json.JSONDecodeError:
             logger.error("JSON decode failed")
-            logger.error(content[:500]")
+            logger.error(content[:500])
             return None
 
     except Exception as e:
