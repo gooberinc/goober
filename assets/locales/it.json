@@ -67,7 +67,7 @@
     "synced_commands": "Sincronizzati",
     "synced_commands2": "comandi!",
     "fail_commands_sync": "Impossibile sincronizzare i comandi:",
-    "started": "{name} è stato avviato!",
+    "started": "{name} è stato avviato!\nIl palco è tuo",
     "name_check": "Errore nel controllo disponibilità del nome:",
     "name_taken": "Il nome è già preso. Scegli un nome diverso.",
     "name_check2": "Errore durante il controllo della disponibilità del nome:",
