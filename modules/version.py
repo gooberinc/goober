@@ -4,6 +4,7 @@ import requests
 import subprocess
 import sys
 import logging
+import json
 logger = logging.getLogger("goober")
 launched = False
 
@@ -34,17 +35,21 @@ def auto_update(branch='main', remote='origin'):
     else:
         logger.info(_( "local_ahead").format(remote=remote, branch=branch))
 
-# Fetch the latest version info from the update server
 def get_latest_version_info():
     try:
         response = requests.get(UPDATE_URL, timeout=5)
         if response.status_code == 200:
-            return response.json()
+            # Try parsing JSON manually, so i dont have to maintain goober central anymore
+            try:
+                return response.json()
+            except json.JSONDecodeError:
+                logger.error(f"{RED}{_('version_error')} JSON decode failed{RESET}")
+                return None
         else:
-            logger.error(f"{RED}{_( 'version_error')} {response.status_code}{RESET}")
+            logger.error(f"{RED}{_('version_error')} {response.status_code}{RESET}")
             return None
     except requests.RequestException as e:
-        logger.error(f"{RED}{_( 'version_error')} {e}{RESET}")
+        logger.error(f"{RED}{_('version_error')} {e}{RESET}")
         return None
 
 # Check if an update is available and perform update if needed
@@ -63,7 +68,7 @@ def check_for_update():
     download_url = latest_version_info.get("download_url")
 
     if not latest_version or not download_url:
-        logger.error(f"{RED}{_(LOCALE, 'invalid_server')}{RESET}")
+        logger.error(f"{RED}{_('invalid_server')}{RESET}")
         return None, None
 
     # Check if local_version is valid

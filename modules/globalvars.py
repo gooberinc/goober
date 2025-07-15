@@ -13,8 +13,9 @@ YELLOW = f"{ANSI}33m"
 PURPLE = f"{ANSI}35m"
 DEBUG = f"{ANSI}1;30m"
 RESET = f"{ANSI}0m"
-VERSION_URL = "https://goober.expect.ovh"
+VERSION_URL = "https://raw.githubusercontent.com/gooberinc/version/main"
 UPDATE_URL = VERSION_URL+"/latest_version.json"
+print(UPDATE_URL)
 LOCAL_VERSION_FILE = "current_version.txt" 
 TOKEN = os.getenv("DISCORDBOTTOKEN", "0")
 PREFIX = os.getenv("BOTPREFIX", "g.")
@@ -38,8 +39,8 @@ arch = platform.machine()
 slash_commands_enabled = True # 100% broken, its a newer enough version so its probably enabled by default.... fix this at somepoint or hard code it in goober central code
 launched = False
 latest_version = "0.0.0"
-local_version = "2.2.0"
+local_version = "2.3.0"
 os.environ['gooberlocal_version'] = local_version
 REACT = os.getenv("REACT")
-beta = False # this makes goober think its a beta version, so it will not update to the latest stable version or run any version checks
+beta = True # this makes goober think its a beta version, so it will not update to the latest stable version or run any version checks
     
