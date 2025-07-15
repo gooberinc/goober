@@ -5,6 +5,8 @@ import subprocess
 import sys
 import logging
 import json
+import time
+import random
 logger = logging.getLogger("goober")
 launched = False
 
@@ -37,19 +39,34 @@ def auto_update(branch='main', remote='origin'):
 
 def get_latest_version_info():
     try:
-        response = requests.get(UPDATE_URL, timeout=5)
-        if response.status_code == 200:
-            # Try parsing JSON manually, so i dont have to maintain goober central anymore
-            try:
-                return response.json()
-            except json.JSONDecodeError:
-                logger.error(f"{RED}{_('version_error')} JSON decode failed{RESET}")
-                return None
-        else:
-            logger.error(f"{RED}{_('version_error')} {response.status_code}{RESET}")
+        unique_suffix = f"{int(time.time())}_{random.randint(0, 9999)}"
+        url = f"{UPDATE_URL}?_={unique_suffix}"
+        
+        curl_cmd = [
+            "curl",
+            "-s",
+            "-H", "Cache-Control: no-cache",
+            "-H", "Pragma: no-cache",
+            url
+        ]
+
+        result = subprocess.run(curl_cmd, capture_output=True, text=True, timeout=5)
+        content = result.stdout
+        
+        if result.returncode != 0:
+            logger.error(f"curl failed with return code {result.returncode}")
             return None
-    except requests.RequestException as e:
-        logger.error(f"{RED}{_('version_error')} {e}{RESET}")
+
+        try:
+            data = json.loads(content)
+            return data
+        except json.JSONDecodeError:
+            logger.error("JSON decode failed")
+            logger.error(content[:500]")
+            return None
+
+    except Exception as e:
+        logger.error(f"Exception in get_latest_version_info: {e}")
         return None
 
 # Check if an update is available and perform update if needed
@@ -82,7 +99,7 @@ def check_for_update():
         logger.info(f"{YELLOW}{_('changelog').format(VERSION_URL=VERSION_URL)}{RESET}")
         auto_update()
     elif beta == True:
-        logger.warning(f"You are running an \"unstable\" version of Goober, do not expect it to work properly.\nVersion {local_version}{RESET}")
+        logger.warning(f"You are running an \"unstable\" version of Goober, do not expect it to work properly.\nVersion {local_version}\nServer: {latest_version}{RESET}")
     elif local_version > latest_version:
         logger.warning(f"{_('modification_warning')}")
     elif local_version == latest_version:
