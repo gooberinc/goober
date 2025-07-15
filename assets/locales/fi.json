@@ -68,7 +68,7 @@
     "synced_commands": "Synkronoitiin",
     "synced_commands2": "komennot!",
     "fail_commands_sync": "Komentojen synkronointi epäonnistui:",
-    "started": "{name} on käynnistynyt!",
+    "started": "{name} on käynnistynyt!\nOlet nyt sarjan tähti, beibi!",
     "name_check": "Nimen saatavuuden tarkistus epäonnistui:",
     "name_taken": "Nimi on jo käytössä. Valitse toinen nimi.",
     "name_check2": "Virhe tapahtui nimen saatavuuden tarkistamisessa:",
