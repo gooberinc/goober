@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 from modules.image import *
+from modules.volta.main import _
 from PIL import Image, ImageEnhance, ImageFilter, ImageOps, ImageChops, ImageColor
 import os, random, shutil, tempfile
 
