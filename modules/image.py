@@ -37,7 +37,7 @@ def split_text_to_fit(text, font, max_width, draw):
     midpoint = len(words) // 2
     return " ".join(words[:midpoint]), " ".join(words[midpoint:])
 
-async def gen_meme(input_image_path, sentence_size=5, max_attempts=10):
+async def gen_meme(input_image_path, sentence_size=5, max_attempts=10, custom_text=None):
     markov_model = load_markov_model()
     if not markov_model or not os.path.isfile(input_image_path):
         return None
@@ -52,19 +52,22 @@ async def gen_meme(input_image_path, sentence_size=5, max_attempts=10):
             font = load_font(font_size)
 
             response = None
-            for _ in range(20):
-                if sentence_size == 1:
-                    candidate = markov_model.make_short_sentence(max_chars=100, tries=100)
-                    if candidate:
-                        candidate = candidate.split()[0]
-                else:
-                    candidate = markov_model.make_sentence(tries=100, max_words=sentence_size)
+            if custom_text:
+                response = custom_text
+            else:
+                for _ in range(20):
+                    if sentence_size == 1:
+                        candidate = markov_model.make_short_sentence(max_chars=100, tries=100)
+                        if candidate:
+                            candidate = candidate.split()[0]
+                    else:
+                        candidate = markov_model.make_sentence(tries=100, max_words=sentence_size)
 
-                if candidate and candidate not in generated_sentences:
-                    if sentence_size > 1:
-                        candidate = improve_sentence_coherence(candidate)
-                    generated_sentences.add(candidate)
-                    response = candidate
+                    if candidate and candidate not in generated_sentences:
+                        if sentence_size > 1:
+                            candidate = improve_sentence_coherence(candidate)
+                        generated_sentences.add(candidate)
+                        response = candidate
                     break
 
             if not response:

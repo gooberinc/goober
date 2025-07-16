@@ -225,7 +225,7 @@ async def talk(ctx: commands.Context, sentence_size: int = 5) -> None:
 
 # Command: Generate an image
 @bot.hybrid_command(description=f"{(_('command_desc_help'))}")
-async def impact(ctx: commands.Context) -> None:
+async def impact(ctx: commands.Context, text: Optional[str] = None) -> None:
     assets_folder: str = "assets/images"
     temp_input: Optional[str] = None
 
@@ -259,7 +259,8 @@ async def impact(ctx: commands.Context) -> None:
         shutil.copy(fallback_image, temp_input)
         input_path = temp_input
 
-    output_path: Optional[str] = await gen_meme(input_path)
+    output_path: Optional[str] = await gen_meme(input_path, custom_text=text)
+
 
     if output_path is None or not os.path.isfile(output_path):
         if temp_input and os.path.exists(temp_input):
