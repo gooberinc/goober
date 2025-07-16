@@ -70,9 +70,7 @@ def get_latest_version_info():
         return None
 
 # Check if an update is available and perform update if needed
-def check_for_update():
-    if ALIVEPING != "True":
-        return  
+def check_for_update(): 
     global latest_version, local_version, launched
 
     latest_version_info = get_latest_version_info()
@@ -87,12 +85,10 @@ def check_for_update():
     if not latest_version or not download_url:
         logger.error(f"{RED}{_('invalid_server')}{RESET}")
         return None, None
-
     # Check if local_version is valid
     if local_version == "0.0.0" or None:
         logger.error(f"{RED}{_('cant_find_local_version')}{RESET}")
         return
-
     # Compare local and latest versions
     if local_version < latest_version:
         logger.info(f"{YELLOW}{_('new_version').format(latest_version=latest_version, local_version=local_version)}{RESET}")

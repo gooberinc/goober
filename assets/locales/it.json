@@ -1,4 +1,6 @@
 {
+    "memory_file_valid": "Il file JSON è valido!",
+    "file_aint_utf8": "Il file non è un UTF-8 valido. Forse è binario?",
     "psutil_not_installed": "Controllo memoria saltato.",
     "not_cloned": "Goober non è stato clonato! Clonalo da GitHub.",
     "checks_disabled": "I controlli sono disabilitati!",

@@ -59,7 +59,8 @@ def check_requirements():
     PACKAGE_ALIASES = {
         "discord": "discord.py",
         "better_profanity": "better-profanity",
-        "dotenv": "python-dotenv"
+        "dotenv": "python-dotenv",
+        "pil": "pillow"
     }
 
     parent_dir = os.path.dirname(os.path.abspath(__file__))
@@ -71,36 +72,13 @@ def check_requirements():
 
     with open(requirements_path, 'r') as f:
         lines = f.readlines()
-        requirements = {
-            line.strip() for line in lines
-            if line.strip() and not line.startswith('#')
-        }
-
-    cogs_dir = os.path.abspath(os.path.join(parent_dir, '..', 'assets', 'cogs'))
-    if os.path.isdir(cogs_dir):
-        for filename in os.listdir(cogs_dir):
-            if filename.endswith('.py'):
-                filepath = os.path.join(cogs_dir, filename)
-                with open(filepath, 'r', encoding='utf-8') as f:
-                    try:
-                        tree = ast.parse(f.read(), filename=filename)
-                        for node in ast.walk(tree):
-                            if isinstance(node, ast.Import):
-                                for alias in node.names:
-                                    pkg = alias.name.split('.')[0]
-                                    if pkg in STD_LIB_MODULES or pkg == 'modules':
-                                        continue
-                                    requirements.add(pkg)
-                            elif isinstance(node, ast.ImportFrom):
-                                if node.module:
-                                    pkg = node.module.split('.')[0]
-                                    if pkg in STD_LIB_MODULES or pkg == 'modules':
-                                        continue
-                                    requirements.add(pkg)
-                    except Exception as e:
-                        logger.warning(f"{(_('warning_failed_parse_imports')).format(filename=filename, error=e)}")
-    else:
-        logger.warning(f"{(_('cogs_dir_not_found')).format(path=cogs_dir)}")
+        requirements = set()
+        for line in lines:
+            line = line.strip()
+            if line and not line.startswith('#'):
+                base_pkg = line.split('==')[0].lower()
+                aliased_pkg = PACKAGE_ALIASES.get(base_pkg, base_pkg)
+                requirements.add(aliased_pkg)
 
     installed_packages = {dist.metadata['Name'].lower() for dist in importlib.metadata.distributions()}
     missing = []
@@ -110,7 +88,7 @@ def check_requirements():
             print((_('std_lib_local_skipped')).format(package=req))
             continue
 
-        check_name = PACKAGE_ALIASES.get(req, req).lower()
+        check_name = req.lower()
 
         if check_name in installed_packages:
             logger.info(f"{_('ok_installed').format(package=check_name)} {check_name}")
@@ -122,31 +100,25 @@ def check_requirements():
         logger.error(_('missing_packages_detected'))
         for pkg in missing:
             print(f"  - {pkg}")
-        logger.info((_('telling_goober_central')).format(url=VERSION_URL))
-        payload = {
-            "name": NAME,
-            "version": local_version,
-            "slash_commands": f"{slash_commands_enabled}\n\n**Error**\nMissing packages have been detected, Failed to start",
-            "token": gooberTOKEN
-        }
-        try:
-            requests.post(VERSION_URL + "/ping", json=payload)  # type: ignore
-        except Exception as e:
-            logger.error(f"{(_('failed_to_contact')).format(url=VERSION_URL, error=e)}")
         sys.exit(1)
     else:
         logger.info(_('all_requirements_satisfied'))
 
 def check_latency():
     host = "1.1.1.1"
-
     system = platform.system()
+
     if system == "Windows":
         cmd = ["ping", "-n", "1", "-w", "1000", host]
         latency_pattern = r"Average = (\d+)ms"
+
+    elif system == "Darwin":
+        cmd = ["ping", "-c", "1", host]
+        latency_pattern = r"time=([\d\.]+) ms"
+
     else:
         cmd = ["ping", "-c", "1", "-W", "1", host]
-        latency_pattern = r"time[=<]\s*([\d\.]+)\s*ms"
+        latency_pattern = r"time=([\d\.]+) ms"
 
     try:
         result = subprocess.run(
@@ -157,7 +129,6 @@ def check_latency():
         )
 
         if result.returncode == 0:
-            print(result.stdout)
             match = re.search(latency_pattern, result.stdout)
             if match:
                 latency_ms = float(match.group(1))
@@ -197,16 +168,6 @@ def check_cpu():
         return
     logger.info((_('measuring_cpu')))
     cpu_per_core = psutil.cpu_percent(interval=1, percpu=True)  # type: ignore
-    for idx, core_usage in enumerate(cpu_per_core):
-        bar_length = int(core_usage / 5) 
-        bar = '█' * bar_length + '-' * (20 - bar_length)
-        if core_usage > 85:
-            color = RED
-        elif core_usage > 60:
-            color = YELLOW
-        else:
-            color = GREEN
-        logger.info((_('core_usage')).format(idx=idx, bar=bar, usage=core_usage))
     total_cpu = sum(cpu_per_core) / len(cpu_per_core)
     logger.info((_('total_cpu_usage')).format(usage=total_cpu))
     if total_cpu > 85:

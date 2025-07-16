@@ -1,4 +1,6 @@
 {
+    "memory_file_valid": "The memory.json file is valid!",
+    "file_aint_uft8": "File is not valid UTF-8 text. Might be binary or corrupted.",
     "psutil_not_installed": "Memory check skipped.",
     "not_cloned": "Goober is not cloned! Please clone it from GitHub.",
     "checks_disabled": "Checks are disabled!",
