@@ -180,8 +180,6 @@ async def retrain(ctx: commands.Context) -> None:
     
     for i, data in enumerate(memory):
         processed_data += 1
-        if processed_data % 1000 == 0 or processed_data == data_size:
-            await send_message(ctx, f"{_('command_markov_retraining').format(processed_data=processed_data, data_size=data_size)}", edit=True, message_reference=processing_message_ref)
 
     global markov_model
     markov_model = train_markov_model(memory)
@@ -389,6 +387,24 @@ async def on_message(message: discord.Message) -> None:
         cleaned_message: str = preprocess_message(formatted_message)
         if cleaned_message:
             memory.append(cleaned_message)
+            message_metadata = {
+                "user_id": str(message.author.id),
+                "user_name": str(message.author),
+                "guild_id": str(message.guild.id) if message.guild else "DM",
+                "guild_name": str(message.guild.name) if message.guild else "DM",
+                "channel_id": str(message.channel.id),
+                "channel_name": str(message.channel),
+                "message": message.content,
+                "timestamp": time.time()
+            }
+            try:
+                if isinstance(memory, list):
+                    memory.append({"_meta": message_metadata})
+                else:
+                    logger.warning("Memory is not a list; can't append metadata")
+            except Exception as e:
+                logger.warning(f"Failed to append metadata to memory: {e}")
+
             save_memory(memory)
 
         sentiment_score = is_positive(message.content) # doesnt work but im scared to change the logic now please ignore

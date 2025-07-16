@@ -1,4 +1,6 @@
 {
+    "memory_file_valid": "The memory.json file is valid!",
+    "file_aint_uft8": "File is not valid UTF-8 text. Might be binary or corrupted.",
     "psutil_not_installed": "Memory check skipped.",
     "not_cloned": "Goober is not cloned! Please clone it from GitHub.",
     "checks_disabled": "Checks are disabled!",
@@ -99,7 +101,7 @@
     "command_markov_retrain": "Retraining the Markov model... Please wait.",
     "command_markov_memory_not_found": "Error: memory file not found!",
     "command_markov_memory_is_corrupt": "Error: memory file is corrupt!",
-    "command_markov_retraining": "Processing {processed_data}/{data_size} data points...",
+    "command_markov_retraining": "Processing {data_size} data points...",
     "command_markov_retrain_successful": "Markov model retrained successfully using {data_size} data points!",
     "command_desc_talk":"talks n like stuf",
     "command_talk_insufficent_text": "I need to learn more from messages before I can talk.",

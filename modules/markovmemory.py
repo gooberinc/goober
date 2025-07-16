@@ -34,13 +34,15 @@ def save_memory(memory):
     with open(MEMORY_FILE, "w") as f:
         json.dump(memory, f, indent=4)
 
-# Train a Markov model using memory and optional additional data
 def train_markov_model(memory, additional_data=None):
     if not memory:
         return None
-    text = "\n".join(memory)
+    filtered_memory = [line for line in memory if isinstance(line, str)]
     if additional_data:
-        text += "\n" + "\n".join(additional_data)
+        filtered_memory.extend(line for line in additional_data if isinstance(line, str))
+    if not filtered_memory:
+        return None
+    text = "\n".join(filtered_memory)
     model = markovify.NewlineText(text, state_size=2)
     return model
 

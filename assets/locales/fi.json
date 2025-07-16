@@ -1,4 +1,6 @@
 {
+    "memory_file_valid": "memory.json on toimiva!",
+    "file_aint_uft8": "Tiedosto ei ole UTF-8 tekstiä. Saattaa olla binääriä tai korruptoitunut.",
     "active_users:": "Aktiiviset käyttäjät:",
     "cog_fail2": "Moduulin lataaminen epäonnistui:",
     "command_ran_s": "Info: {interaction.user} suoritti",
