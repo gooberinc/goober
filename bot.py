@@ -387,6 +387,24 @@ async def on_message(message: discord.Message) -> None:
         cleaned_message: str = preprocess_message(formatted_message)
         if cleaned_message:
             memory.append(cleaned_message)
+            message_metadata = {
+                "user_id": str(message.author.id),
+                "user_name": str(message.author),
+                "guild_id": str(message.guild.id) if message.guild else "DM",
+                "guild_name": str(message.guild.name) if message.guild else "DM",
+                "channel_id": str(message.channel.id),
+                "channel_name": str(message.channel),
+                "message": message.content,
+                "timestamp": time.time()
+            }
+            try:
+                if isinstance(memory, list):
+                    memory.append({"_meta": message_metadata})
+                else:
+                    logger.warning("Memory is not a list; can't append metadata")
+            except Exception as e:
+                logger.warning(f"Failed to append metadata to memory: {e}")
+
             save_memory(memory)
 
         sentiment_score = is_positive(message.content) # doesnt work but im scared to change the logic now please ignore
