@@ -100,7 +100,7 @@
     "command_markov_retrain": "Rafforzamento del modello Markov in corso... Attendere.",
     "command_markov_memory_not_found": "Errore: file di memoria non trovato!",
     "command_markov_memory_is_corrupt": "Errore: file di memoria corrotto!",
-    "command_markov_retraining": "Elaborazione di {processed_data}/{data_size} punti dati...",
+    "command_markov_retraining": "Elaborazione di {data_size} punti dati...",
     "command_markov_retrain_successful": "Modello Markov rafforzato con successo utilizzando {data_size} punti dati!",
     "command_desc_talk": "parla n come stuf",
     "command_talk_insufficent_text": "Ho bisogno di imparare di più dai messaggi prima di poter parlare.",

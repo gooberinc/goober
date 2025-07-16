@@ -180,8 +180,6 @@ async def retrain(ctx: commands.Context) -> None:
     
     for i, data in enumerate(memory):
         processed_data += 1
-        if processed_data % 1000 == 0 or processed_data == data_size:
-            await send_message(ctx, f"{_('command_markov_retraining').format(processed_data=processed_data, data_size=data_size)}", edit=True, message_reference=processing_message_ref)
 
     global markov_model
     markov_model = train_markov_model(memory)

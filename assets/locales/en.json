@@ -99,7 +99,7 @@
     "command_markov_retrain": "Retraining the Markov model... Please wait.",
     "command_markov_memory_not_found": "Error: memory file not found!",
     "command_markov_memory_is_corrupt": "Error: memory file is corrupt!",
-    "command_markov_retraining": "Processing {processed_data}/{data_size} data points...",
+    "command_markov_retraining": "Processing {data_size} data points...",
     "command_markov_retrain_successful": "Markov model retrained successfully using {data_size} data points!",
     "command_desc_talk":"talks n like stuf",
     "command_talk_insufficent_text": "I need to learn more from messages before I can talk.",
