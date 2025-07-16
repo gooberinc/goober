@@ -1,7 +1,8 @@
 import discord
 from discord.ext import commands
-import os 
 from modules.globalvars import ownerid
+
+COG_PREFIX = "assets.cogs."
 
 class CogManager(commands.Cog):
     def __init__(self, bot):
@@ -16,7 +17,7 @@ class CogManager(commands.Cog):
             await ctx.send("Please provide the cog name to load.")
             return
         try:
-            await self.bot.load_extension(f"cogs.{cog_name}")
+            await self.bot.load_extension(COG_PREFIX + cog_name)
             await ctx.send(f"Loaded cog `{cog_name}` successfully.")
         except Exception as e:
             await ctx.send(f"Error loading cog `{cog_name}`: {e}")
@@ -30,7 +31,7 @@ class CogManager(commands.Cog):
             await ctx.send("Please provide the cog name to unload.")
             return
         try:
-            await self.bot.unload_extension(f"cogs.{cog_name}")
+            await self.bot.unload_extension(COG_PREFIX + cog_name)
             await ctx.send(f"Unloaded cog `{cog_name}` successfully.")
         except Exception as e:
             await ctx.send(f"Error unloading cog `{cog_name}`: {e}")
@@ -44,8 +45,8 @@ class CogManager(commands.Cog):
             await ctx.send("Please provide the cog name to reload.")
             return
         try:
-            await self.bot.unload_extension(f"cogs.{cog_name}")
-            await self.bot.load_extension(f"cogs.{cog_name}")
+            await self.bot.unload_extension(COG_PREFIX + cog_name)
+            await self.bot.load_extension(COG_PREFIX + cog_name)
             await ctx.send(f"Reloaded cog `{cog_name}` successfully.")
         except Exception as e:
             await ctx.send(f"Error reloading cog `{cog_name}`: {e}")

@@ -99,17 +99,6 @@ async def load_cogs_from_folder(bot, folder_name="assets/cogs"):
                 logger.error(f"{(_('cog_fail'))} {cog_name} {e}")
                 traceback.print_exc()
 
-async def fetch_active_users() -> str:
-    try:
-        response: requests.Response = requests.get(f"{VERSION_URL}/active-users")
-        if response.status_code == 200:
-            return response.text.strip()
-        else:
-            return "?"
-    except Exception as e:
-        logger.e(f"{_('error_fetching_active_users')} {RESET} {e}")
-        return "?"
-
 async def send_alive_ping_periodically() -> None:
     while True:
         try:
@@ -134,9 +123,6 @@ async def on_ready() -> None:
         synced: List[discord.app_commands.AppCommand] = await bot.tree.sync()
         logger.info(f"{_('synced_commands')} {len(synced)} {(_('synced_commands2'))}")
         slash_commands_enabled = True
-        
-        active_users: str = await fetch_active_users()
-        logger.info(f"{(_('active_users:'))} {active_users}")
         logger.info(f"{(_('started')).format(name=NAME)}")
 
         bot.loop.create_task(send_alive_ping_periodically())

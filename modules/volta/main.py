@@ -3,6 +3,7 @@
 # For updates or contributions, visit: https://github.com/gooberinc/volta
 # Also, Note to self: Add more comments it needs more love
 import os
+import locale
 import json
 import pathlib
 import threading
@@ -15,8 +16,6 @@ GREEN = f"{ANSI}32m"
 YELLOW = f"{ANSI}33m"
 DEBUG = f"{ANSI}1;30m"
 RESET = f"{ANSI}0m"
-
-load_dotenv()
 
 LOCALE = os.getenv("LOCALE")
 module_dir = pathlib.Path(__file__).parent.parent
@@ -62,6 +61,37 @@ if working_dir != module_dir:
 translations = {}
 _file_mod_times = {}
 
+import locale
+import platform
+import os
+import sys
+
+def get_system_locale():
+    system = platform.system() # fallback incase locale isnt set
+    if system == "Windows":
+        lang, _ = locale.getdefaultlocale()
+        return lang or os.getenv("LANG")
+    elif system == "Darwin":
+        try:
+            import subprocess
+            result = subprocess.run(
+                ["defaults", "read", "-g", "AppleLocale"],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.DEVNULL,
+                text=True
+            )
+            return result.stdout.strip() or locale.getdefaultlocale()[0]
+        except Exception:
+            return locale.getdefaultlocale()[0]
+    elif system == "Linux":
+        return (
+            os.getenv("LC_ALL") or
+            os.getenv("LANG") or
+            locale.getdefaultlocale()[0]
+        )
+    return locale.getdefaultlocale()[0]
+
+
 def load_translations():
     global translations, _file_mod_times
     translations.clear()
@@ -99,7 +129,9 @@ def reload_if_changed():
 
 def set_language(lang: str):
     global LOCALE, ENGLISH_MISSING
-    if lang in translations:
+    if not LOCALE:
+        LOCALE = get_system_locale()
+    elif lang in translations:
         LOCALE = lang
     else:
         print(f"[VOLTA] {RED}Language '{lang}' not found, defaulting to 'en'{RESET}")
@@ -141,19 +173,27 @@ def check_missing_translations():
     else:
         print(f"[VOLTA] All translation keys present for locale: {LOCALE}")
 
+printedsystemfallback = False
 
 def get_translation(lang: str, key: str):
+    global printedsystemfallback
     if ENGLISH_MISSING:
         return f"[VOLTA] {RED}No fallback available!{RESET}"
+    fallback_translations = translations.get(FALLBACK_LOCALE, {})
+    sys_lang = get_system_locale().split("_")[0] if get_system_locale() else None
+    sys_translations = translations.get(sys_lang, {}) if sys_lang else {}
     lang_translations = translations.get(lang, {})
     if key in lang_translations:
         return lang_translations[key]
-    else:
-        if key not in translations.get(FALLBACK_LOCALE, {}):
-            return f"[VOLTA] {YELLOW}Missing key: '{key}' in {FALLBACK_LOCALE}.json!{RESET}"
-    fallback = translations.get(FALLBACK_LOCALE, {}).get(key, key)
-    print(f"[VOLTA] {YELLOW}Missing key: '{key}' in language '{lang}', falling back to: '{fallback}' using {FALLBACK_LOCALE}.json{RESET}") # yeah probably print this
-    return fallback
+    if sys_lang and sys_lang != lang and key in sys_translations:
+        if not printedsystemfallback:
+            print(f"[VOLTA] {YELLOW}Falling back to system language {sys_lang}!{RESET}")
+            printedsystemfallback = True
+        return sys_translations[key]
+    if key in fallback_translations:
+        print(f"[VOLTA] {YELLOW}Missing key: '{key}' in '{lang}', falling back to fallback locale '{FALLBACK_LOCALE}'{RESET}")
+        return fallback_translations[key]
+    return f"[VOLTA] {YELLOW}Missing key: '{key}' in all locales!{RESET}"
 
 def _(key: str) -> str:
     return get_translation(LOCALE, key)
