@@ -113,6 +113,7 @@ async def on_ready() -> None:
     global launched
     global slash_commands_enabled
     global NAME
+    global status
     
     folder_name: str = "cogs"
     if launched:
@@ -136,8 +137,15 @@ async def on_ready() -> None:
         quit()
         
     if not song:
-        return  
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=f"{song}"))
+        return
+    
+    status = {
+        "idle": discord.Status.idle,
+        "dnd": discord.Status.dnd,
+        "invisible": discord.Status.invisible,
+        "online": discord.Status.online
+    }.get(status.lower(), discord.Status.online)
+    await bot.change_presence(status=status, activity=discord.Activity(type=discord.ActivityType.listening, name=f"{song}"))
     launched = True
 
 @bot.event
@@ -372,7 +380,7 @@ async def on_message(message: discord.Message) -> None:
 
     if str(message.author.id) in BLACKLISTED_USERS:
         return
-
+    
     if message.content.startswith((f"{PREFIX}talk", f"{PREFIX}mem", f"{PREFIX}help", f"{PREFIX}stats", f"{PREFIX}")):
         logger.info(f"{(_('command_ran')).format(message=message)}")
         await bot.process_commands(message)

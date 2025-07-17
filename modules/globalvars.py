@@ -35,6 +35,7 @@ LOCALE = os.getenv("LOCALE", "en")
 gooberTOKEN = os.getenv("GOOBERTOKEN")
 splashtext = os.getenv("SPLASHTEXT")
 ownerid = int(os.getenv("OWNERID", "0"))
+status = os.getenv("STATUS")
 showmemenabled = os.getenv("SHOWMEMENABLED")
 BLACKLISTED_USERS = os.getenv("BLACKLISTEDUSERS", "").split(",")
 USERTRAIN_ENABLED = os.getenv("USERTRAINENABLED", "true").lower() == "true"
@@ -44,7 +45,7 @@ MEMORY_LOADED_FILE = "MEMORY_LOADED" # is this still even used?? okay just check
 ALIVEPING = os.getenv("ALIVEPING")
 AUTOUPDATE = os.getenv("AUTOUPDATE")
 # IGNOREWARNING = False # is this either??? i don't think so?
-song = os.getenv("song")
+song = os.getenv("SONG")
 arch = platform.machine()
 slash_commands_enabled = True # 100% broken, its a newer enough version so its probably enabled by default.... fix this at somepoint or hard code it in goober central code
 launched = False
